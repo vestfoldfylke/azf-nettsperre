@@ -19,11 +19,17 @@ app.http('activateBlock-dev', {
         // Add leading zeros to the date if it is less than 10
         const date = dateFormat.replace(/(\D)(\d)(?=\D|$)/g, '$10$2')
 
+        const testLocal = d.toLocaleString('nb-NO', {timeZone: 'Europe/Oslo', hour12: false, hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'});
+        const dateObj = {
+            dateFormat: date,
+            localDateString: testLocal,
+        }
+
         // Find any blocks with the start date less than or equal to the current date(UTC)
         // const blocks = await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).find({ startBlock: { $lte: new Date() } }).toArray()
 
 
         // const test = await addGroupMembers('7706000b-b3f5-4965-a35f-a7bce947959c', members)
-        return {status: 200, jsonBody: date};
+        return {status: 200, jsonBody: dateObj};
     }
 });
