@@ -85,33 +85,36 @@ const removeGroupMembers = async (groupId, members) => {
     // Check if the member is in the group, if the member is not in the group, remove them from the list
     const currentMembers = await getGroupMembers(groupId)
     const currentMemberIds = currentMembers.map(member => member.id)
-    members = members.filter(member => currentMemberIds.includes(member))
+    members = members.filter(member => currentMemberIds.includes(member.id))
+    console.log(members)
     if(members.length === 0) return membersRemoved
     logger('info', [logPrefix, `Found ${members.length} members to remove from the group with id ${groupId}`])
 
     for (const member of members) {
+        console.log(member.id)
         let memberInfo = {
-            memberID: member,
+            memberID: member.id,
             groupID: groupId,
             error: null
         }
         membersRemoved.total++
-        const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/${member}/$ref`
+        const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/${member.id}/$ref`
         try {
             const request = await graphRequest(url, 'DELETE', 'null', 'eventual')
-            logger('info', [logPrefix, `Removed member with id ${member} to group with id ${groupId}`])
+            console.log(request)
+            logger('info', [logPrefix, `Removed member with id ${member.id} to group with id ${groupId}`])
             membersRemoved.membersRemoved++
             membersRemoved.success.push(memberInfo)
         } catch (error) {
             console.error(error?.response?.data?.error || error)
-            logger('WARN', [logPrefix, `Failed to remove member with id ${member} from group with id ${groupId}`, error?.response?.data?.error || error])
+            logger('WARN', [logPrefix, `Failed to remove member with id ${member.id} from group with id ${groupId}`, error?.response?.data?.error || error])
             membersRemoved.membersRemoved++
             memberInfo.error = (error?.response?.data?.error || error)
             membersRemoved.failed.push(memberInfo)
             continue
         } 
     }
-
+    console.log(membersRemoved)
     return membersRemoved
 }
 
@@ -140,25 +143,25 @@ const addGroupMembers = async (groupId, members) => {
     // Check if the member is already in the group and remove them from the list
     const currentMembers = await getGroupMembers(groupId)
     const currentMemberIds = currentMembers.map(member => member.id)
-    members = members.filter(member => !currentMemberIds.includes(member))
+    members = members.filter(member => !currentMemberIds.includes(member.id))
     logger('info', [logPrefix, `Found ${members.length} members to add to group with id ${groupId}`])
  
     for (const member of members) {
         let memberInfo = {
-            memberID: member,
+            memberID: member.id,
             groupID: groupId,
             error: null
         }
         membersAdded.total++
         const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/$ref`
         try {
-            const request = await graphRequest(url, 'POST', { '@odata.id': `https://graph.microsoft.com/v1.0/directoryObjects/${member}` }, 'eventual')
-            logger('info', [logPrefix, `Added member with id ${member} to group with id ${groupId}`])
+            const request = await graphRequest(url, 'POST', { '@odata.id': `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}` }, 'eventual')
+            logger('info', [logPrefix, `Added member with id ${member.id} to group with id ${groupId}`])
             membersAdded.membersAdded++
             membersAdded.success.push(memberInfo)
         } catch (error) {
             console.error(error?.response?.data?.error || error)
-            logger('WARN', [logPrefix, `Failed to add member with id ${member} to group with id ${groupId}`, error?.response?.data?.error || error])
+            logger('WARN', [logPrefix, `Failed to add member with id ${member.id} to group with id ${groupId}`, error?.response?.data?.error || error])
             membersAdded.failedNumber++
             memberInfo.error = (error?.response?.data?.error || error)
             membersAdded.failed.push(memberInfo)

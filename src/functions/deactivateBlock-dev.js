@@ -2,16 +2,14 @@ const { app } = require('@azure/functions');
 const { logger } = require('@vtfk/logger')
 const { handleUserActions } = require('../lib/jobs/handleUserActions.js')
 
-
-app.http('activateBlock-dev', {
-    methods: ['GET', 'POST'],
+app.http('deactivateBlock-dev', {
+    methods: ['GET'],
     authLevel: 'anonymous',
-    route: 'activateBlock-dev',
+    route: 'deactivateBlock-dev',
     handler: async (request, context) => {
-        const logPrefix = 'activateBlock-dev'
-        
+        const logPrefix = 'deactivateBlock-dev'
         try {
-            const response = await handleUserActions('activate')
+            const response = await handleUserActions('deactivate')
             return { status: 200, jsonBody: response }
         } catch (error) {
             logger('error', [logPrefix, error])
