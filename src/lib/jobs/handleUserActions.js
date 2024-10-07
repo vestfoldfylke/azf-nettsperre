@@ -26,8 +26,8 @@ const handleUserActions = async (action) => {
         blockStatus = 'active'
     }
 
-    // Find any blocks with the start date less than or equal to the current date
     try {
+        // Find any blocks with the start date less than or equal to the current date
         logger('info', [logPrefix, `Finding blocks with start date less than or equal to current date - ${dateLocalFormat}` ])
         const blocks = await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).find({status: blockStatus, startBlock: { $lte: dateLocalFormat }}).toArray()
         logger('info', [logPrefix, `Found ${blocks.length} blocks`])
