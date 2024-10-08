@@ -12,7 +12,6 @@ app.http('deleteBlock', {
     route: 'deleteBlock/{id}/{action}',
     handler: async (request, context) => {
         const body = await request.json();
-        console.log(body)
         const id = request.params.id
         const action = request.params.action
         const logPrefix = 'deleteBlock'
