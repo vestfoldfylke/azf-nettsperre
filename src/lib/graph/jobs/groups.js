@@ -86,12 +86,10 @@ const removeGroupMembers = async (groupId, members) => {
     const currentMembers = await getGroupMembers(groupId)
     const currentMemberIds = currentMembers.map(member => member.id)
     members = members.filter(member => currentMemberIds.includes(member.id))
-    console.log(members)
     if(members.length === 0) return membersRemoved
     logger('info', [logPrefix, `Found ${members.length} members to remove from the group with id ${groupId}`])
 
     for (const member of members) {
-        console.log(member.id)
         let memberInfo = {
             memberID: member.id,
             groupID: groupId,
@@ -101,7 +99,6 @@ const removeGroupMembers = async (groupId, members) => {
         const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/${member.id}/$ref`
         try {
             const request = await graphRequest(url, 'DELETE', 'null', 'eventual')
-            console.log(request)
             logger('info', [logPrefix, `Removed member with id ${member.id} to group with id ${groupId}`])
             membersRemoved.membersRemoved++
             membersRemoved.success.push(memberInfo)
@@ -114,7 +111,6 @@ const removeGroupMembers = async (groupId, members) => {
             continue
         } 
     }
-    console.log(membersRemoved)
     return membersRemoved
 }
 

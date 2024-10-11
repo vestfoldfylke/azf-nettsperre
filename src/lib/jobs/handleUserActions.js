@@ -2,6 +2,7 @@ const { getMongoClient } = require('../../lib/auth/mongoClient.js')
 const { mongoDB } = require('../../../config.js')
 const { logger } = require('@vtfk/logger')
 const { addGroupMembers, removeGroupMembers } = require('../../lib/graph/jobs/groups.js'); 
+const { createStatistics } = require('./createStats.js');
 
 /**
  * 
@@ -44,9 +45,13 @@ const handleUserActions = async (action) => {
                 if(action === 'activate') {
                     logger('info', [logPrefix, `Adding ${block.students.length} students to group: ${block.typeBlock.groupId}`])
                     await addGroupMembers(block.typeBlock.groupId, block.students)
+                    // Create stats
+                    await createStatistics(block, action)
                 } else {
                     logger('info', [logPrefix, `Removing ${block.students.length} students from group: ${block.typeBlock.groupId}`])
                     await removeGroupMembers(block.typeBlock.groupId, block.students)
+                    // Create stats
+                    await createStatistics(block, action)
                 }
             } catch (error) {
                 if(action === 'activate') {
