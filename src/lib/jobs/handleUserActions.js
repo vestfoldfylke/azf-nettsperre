@@ -27,7 +27,12 @@ const handleUserActions = async (action) => {
         blockStatus = 'active'
     }
 
-    try {
+    let blockObj = {
+        blocksAdded: [],
+        blocksRemoved: []
+    }
+
+    if(action === 'activate') {
         // Find any blocks with the start date less than or equal to the current date
         logger('info', [logPrefix, `Finding blocks with start date less than or equal to current date - ${dateLocalFormat}` ])
         const blocks = await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).find({status: blockStatus, startBlock: { $lte: dateLocalFormat }}).toArray()
@@ -37,40 +42,47 @@ const handleUserActions = async (action) => {
         if(blocks.length < 1){
             return {status: 200, jsonBody: `No blocks to ${action}`}
         }
-
         // Loop through the blocks that are found
         for (const block of blocks) {
             try {
-                // Add/remove the students to the group
-                if(action === 'activate') {
-                    logger('info', [logPrefix, `Adding ${block.students.length} students to group: ${block.typeBlock.groupId}`])
-                    await addGroupMembers(block.typeBlock.groupId, block.students)
-                    // Create stats
-                    await createStatistics(block, action)
-                } else {
-                    logger('info', [logPrefix, `Removing ${block.students.length} students from group: ${block.typeBlock.groupId}`])
-                    await removeGroupMembers(block.typeBlock.groupId, block.students)
-                    // Create stats
-                    await createStatistics(block, action)
-                }
+                // Add the students to the group
+                logger('info', [logPrefix, `Adding ${block.students.length} students to group: ${block.typeBlock.groupId}`])
+                await addGroupMembers(block.typeBlock.groupId, block.students)
+                // Create stats
+                await createStatistics(block, action)
             } catch (error) {
-                if(action === 'activate') {
-                    logger('error', [logPrefix, `Error adding members to group: ${error}`])
-                } else {
-                    logger('error', [logPrefix, `Error removing members from group: ${error}`])
-                }
+                logger('error', [logPrefix, `Error adding members to group: ${error}`])
             }
             // Update the status of the block to active/expired
-            if(action === 'activate') {
-                await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).updateOne({ _id: block._id }, {$set: { status: 'active' }})
-            } else {
-                await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).updateOne({ _id: block._id }, {$set: { status: 'expired' }})
-            }
+            await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).updateOne({ _id: block._id }, {$set: { status: 'active' }})
+            blockObj.blocksAdded.push(block)
         }
-        return {status: 200, jsonBody: blocks};
-    } catch (error) {
-        logger('error', [logPrefix, `Error finding blocks: ${error}`])
+    } else {
+         // Find any blocks with the start date less than or equal to the current date
+         logger('info', [logPrefix, `Finding blocks with start date less than or equal to current date - ${dateLocalFormat}` ])
+         const blocks = await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).find({status: blockStatus, endBlock: { $lte: dateLocalFormat }}).toArray()
+         logger('info', [logPrefix, `Found ${blocks.length} blocks`])
+ 
+         // If there are no blocks, return
+         if(blocks.length < 1){
+             return {status: 200, jsonBody: `No blocks to ${action}`}
+         }
+         // Loop through the blocks that are found
+         for (const block of blocks) {
+            try {
+                logger('info', [logPrefix, `Removing ${block.students.length} students from group: ${block.typeBlock.groupId}`])
+                await removeGroupMembers(block.typeBlock.groupId, block.students)
+                // Create stats
+                await createStatistics(block, action)
+            } catch (error) {
+                logger('error', [logPrefix, `Error removing members from group: ${error}`])
+            }
+            // Update the status of the block to active/expired
+            await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).updateOne({ _id: block._id }, {$set: { status: 'expired' }})
+            blockObj.blocksRemoved.push(block)
+         }
     }
+        return {status: 200, jsonBody: blockObj};
 }
 
 module.exports = {handleUserActions}
