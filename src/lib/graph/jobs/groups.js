@@ -44,11 +44,25 @@ const getGroupMembers = async (groupId, onlyStudents) => {
     // Get the list of members in a group
     // Input validation
     if (!groupId) throw new Error('Cannot search for a group if \'groupId\' is not specified')
-    const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,mail`
-    let data = await graphRequest(url, 'GET', 'null', 'eventual')
-    
+    let url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,mail&$count=true&$top=100`
+    let finished = false
+    const result = {
+        count: 0, 
+        value: []
+    }
+    let page = 0
+    let data
+    while (!finished) {
+        data = await graphRequest(url, 'GET', 'null', 'eventual')
+        finished = data['@odata.nextLink'] === undefined
+        url = data['@odata.nextLink']
+        result.value = result.value.concat(data.value)
+        page++
+    }
+    result.count = result.value.length
+
     // Clean up the response
-    if (data?.value) data = data.value
+    if (result?.value) data = result.value
     if (onlyStudents === 'true') {
         // Filter out any resources that is not a student
         logger('info', [logPrefix, `Removing any resources that is not a student for group with id ${groupId}`])
