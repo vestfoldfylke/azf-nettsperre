@@ -4,8 +4,8 @@ const { logger } = require('@vtfk/logger')
 const { handleUserActions } = require('../lib/jobs/handleUserActions.js')
 
 app.timer('activateBlocks', {
-    // Every 5min for testing
-    schedule: '*/5 * * * *', 
+    // At every 5th minute from 0 through 59.
+    schedule: '0-59/5 * * * *', 
     // schedule: '*/5 6-21 * * 1-5', // Every 5 minutes between 6am and 9pm, Monday to Friday
     handler: async (myTimer, context) => {
         const logPrefix = 'activateBlock-dev'
