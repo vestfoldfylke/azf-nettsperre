@@ -27,5 +27,6 @@ module.exports = {
     },
     misc: {
         email_domain: process.env.EMAIL_DOMAIN,
+        allowedCompanies: process.env.SKIPVALIDATION.split(','),
     }
 }
