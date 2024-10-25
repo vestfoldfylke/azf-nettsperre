@@ -11,6 +11,7 @@ const createStatistics = async (block, action) => {
     // Get info about the person who created the block
     const createdBy = await getUser(block.createdBy.userPrincipalName)
     // Build the request
+    
     const request = {
         method: 'post',
         url: statistics.url + '/stats',

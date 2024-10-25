@@ -44,7 +44,7 @@ const getGroupMembers = async (groupId, onlyStudents) => {
     // Get the list of members in a group
     // Input validation
     if (!groupId) throw new Error('Cannot search for a group if \'groupId\' is not specified')
-    let url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,mail&$count=true&$top=100`
+    let url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,mail,officeLocation&$count=true&$top=100`
     let finished = false
     const result = {
         count: 0, 
