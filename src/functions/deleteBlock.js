@@ -14,7 +14,7 @@ app.http('deleteBlock', {
     handler: async (request, context) => {
         const body = await request.json();
         const id = request.params.id
-        const action = request.params.action
+        let action = request.params.action // Must be able to change the action to deactivate if the block is active
         const logPrefix = 'deleteBlock'
 
         // Connect to the database
@@ -25,6 +25,11 @@ app.http('deleteBlock', {
             if(!block){
                 logger('error', [logPrefix, 'Block not found'])
                 return { status: 404, body: 'Block not found' }
+            }
+
+            if(block.status === 'active' && action === 'delete'){
+                logger('warn', [logPrefix, 'Cannot delete an active block, change the action to deactivate'])
+                action = 'deactivate'
             }
 
             if(action === 'delete'){
