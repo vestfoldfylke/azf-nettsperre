@@ -45,6 +45,11 @@ const handleUserActions = async (action) => {
         // Loop through the blocks that are found
         for (const block of blocks) {
             try {
+                // If there's more than one block to activate, delay the activation of the next block by 1 seconds
+                if(blocks.length > 1) {
+                    logger('info', [logPrefix, `Found more than 1 block to ${action}, delaying the activation of the next block by 1 second`])
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
                 // Add the students to the group
                 logger('info', [logPrefix, `Adding ${block.students.length} students to group: ${block.typeBlock.groupId}`])
                 await addGroupMembers(block.typeBlock.groupId, block.students)
@@ -70,6 +75,11 @@ const handleUserActions = async (action) => {
          // Loop through the blocks that are found
          for (const block of blocks) {
             try {
+                // If there's more than one block to deactivate, delay the deactivation of the next block by 1 seconds
+                if(blocks.length > 1) {
+                    logger('info', [logPrefix, `Found more than 1 block to ${action}, delaying the deactivation of the next block by 1 second`])
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
                 logger('info', [logPrefix, `Removing ${block.students.length} students from group: ${block.typeBlock.groupId}`])
                 await removeGroupMembers(block.typeBlock.groupId, block.students)
                 // Create stats

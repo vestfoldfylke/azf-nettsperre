@@ -1,6 +1,12 @@
 const { graphRequest } = require ('../call-graph.js')
 
-// This function retrieves a user from the Microsoft Graph API
+/**
+ * Fetches user details from Microsoft Graph API based on the provided user principal name (UPN).
+ *
+ * @param {string} upn - The user principal name of the user to fetch.
+ * @returns {Promise<Object>} A promise that resolves to the user details object.
+ * @throws {Error} Throws an error if the 'upn' parameter is not specified.
+ */
 const getUser = async (upn) => {
   // Input validation
   if (!upn) throw new Error('Cannot search for a user if \'upn\' is not specified')
