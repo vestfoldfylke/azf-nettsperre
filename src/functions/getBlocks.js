@@ -50,7 +50,14 @@ app.http('getBlocks', {
             const mongoClient = await getMongoClient()
             // Find all blocks with status in the statusArray and teacher upn
             logger('info', [logPrefix, `Fetching blocks with status: ${statusArray}`])
-            // Create a filter object
+            /**
+             * Filter object used to query blocks based on status and teacher's user principal name.
+             * 
+             * @typedef {Object} Filter
+             * @property {Object} status - The status filter object.
+             * @property {Array} status.$in - Array of statuses to include in the filter.
+             * @property {string} teacher.userPrincipalName - The user principal name of the teacher.
+             */
             const filter = {
                 status: {
                     $in: statusArray

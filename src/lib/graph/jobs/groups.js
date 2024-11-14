@@ -3,9 +3,11 @@ const { misc } = require ('../../../../config.js')
 const { logger } = require('@vtfk/logger')
 
 /**
- * 
- * @param {String} upn 
- * @returns 
+ * Retrieves the list of directory objects owned by a user, filters out non-SDS teams and expired resources.
+ *
+ * @param {string} upn - The User Principal Name (UPN) of the user.
+ * @returns {Promise<Array>} A promise that resolves to an array of owned objects that are school teams and not expired.
+ * @throws {Error} If the 'upn' parameter is not specified.
  */
 const getOwnedObjects = async (upn) => {
     logPrefix = 'getOwnedObjects'
@@ -33,11 +35,14 @@ const getOwnedObjects = async (upn) => {
     return data
 }
 
+
 /**
- * 
- * @param {String} groupId
- * @param {Boolean} onlyStudents 
- * @returns 
+ * Retrieves the members of a specified group from Microsoft Graph API.
+ *
+ * @param {string} groupId - The ID of the group to retrieve members from.
+ * @param {boolean} onlyStudents - If true, filters the members to include only students.
+ * @returns {Promise<Array>} A promise that resolves to an array of group members.
+ * @throws {Error} Throws an error if the groupId is not specified.
  */
 const getGroupMembers = async (groupId, onlyStudents) => {
     logPrefix = 'getGroupMembers'
@@ -76,10 +81,13 @@ const getGroupMembers = async (groupId, onlyStudents) => {
 }
 
 /**
- * 
- * @param {String} groupId 
- * @param {Array} members 
- */
+ * Removes specified members from a group.
+ *
+ * @param {string} groupId - The ID of the group from which members will be removed.
+ * @param {Array} members - An array of member objects to be removed from the group.
+ * @returns {Object} An object containing the results of the removal operation.
+ * @throws {Error} Throws an error if 'groupId' or 'members' is not specified, or if 'members' is not an array.
+*/
 const removeGroupMembers = async (groupId, members) => {
     logPrefix = 'removeGroupMembers'
     // Input validation
@@ -104,6 +112,16 @@ const removeGroupMembers = async (groupId, members) => {
     logger('info', [logPrefix, `Found ${members.length} members to remove from the group with id ${groupId}`])
 
     for (const member of members) {
+        // If members.length is greater than 5, split the array into equal parts but not bigger than 5. This is to avoid throttling and issues with the graph api.
+        if (members.length > 5) {
+            logger('info', [logPrefix, `Found more than 5 members to remove from the group with id ${groupId}, splitting the array into equal parts of 5`])
+            const memberIndex = members.indexOf(member)
+            const memberIndexEnd = memberIndex + 5
+            const membersToProcess = members.slice(memberIndex, memberIndexEnd)
+            members.splice(memberIndex, 5)
+            const membersRemovedPart = await removeGroupMembers(groupId, membersToProcess)
+            continue
+        }
         let memberInfo = {
             memberID: member.id,
             groupID: groupId,
@@ -129,9 +147,12 @@ const removeGroupMembers = async (groupId, members) => {
 }
 
 /**
- * 
- * @param {String} groupId 
- * @param {Array} members 
+ * Adds members to a specified group.
+ *
+ * @param {string} groupId - The ID of the group to add members to.
+ * @param {Array} members - An array of member objects to be added to the group.
+ * @returns {Promise<Object>} An object containing the results of the operation, including total members processed, members successfully added, and any failures.
+ * @throws {Error} Throws an error if 'groupId' or 'members' is not specified, or if 'members' is not an array.
  */
 const addGroupMembers = async (groupId, members) => {
     logPrefix = 'addGroupMembers'
@@ -157,6 +178,16 @@ const addGroupMembers = async (groupId, members) => {
     logger('info', [logPrefix, `Found ${members.length} members to add to group with id ${groupId}`])
  
     for (const member of members) {
+        // If members.length is greater than 5, split the array into equal parts but not bigger than 5. This is to avoid throttling and issues with the graph api.
+        if (members.length > 5) {
+            logger('info', [logPrefix, `Found more than 5 members to remove from the group with id ${groupId}, splitting the array into equal parts of 5`])
+            const memberIndex = members.indexOf(member)
+            const memberIndexEnd = memberIndex + 5
+            const membersToProcess = members.slice(memberIndex, memberIndexEnd)
+            members.splice(memberIndex, 5)
+            const membersRemovedPart = await removeGroupMembers(groupId, membersToProcess)
+            continue
+        }
         let memberInfo = {
             memberID: member.id,
             groupID: groupId,
@@ -179,6 +210,6 @@ const addGroupMembers = async (groupId, members) => {
     }
 
     return membersAdded
- }
+}
 
 module.exports = { getOwnedObjects, getGroupMembers, addGroupMembers, removeGroupMembers }
