@@ -112,16 +112,6 @@ const removeGroupMembers = async (groupId, members) => {
     logger('info', [logPrefix, `Found ${members.length} members to remove from the group with id ${groupId}`])
 
     for (const member of members) {
-        // If members.length is greater than 5, split the array into equal parts but not bigger than 5. This is to avoid throttling and issues with the graph api.
-        if (members.length > 5) {
-            logger('info', [logPrefix, `Found more than 5 members to remove from the group with id ${groupId}, splitting the array into equal parts of 5`])
-            const memberIndex = members.indexOf(member)
-            const memberIndexEnd = memberIndex + 5
-            const membersToProcess = members.slice(memberIndex, memberIndexEnd)
-            members.splice(memberIndex, 5)
-            const membersRemovedPart = await removeGroupMembers(groupId, membersToProcess)
-            continue
-        }
         let memberInfo = {
             memberID: member.id,
             groupID: groupId,
@@ -178,16 +168,6 @@ const addGroupMembers = async (groupId, members) => {
     logger('info', [logPrefix, `Found ${members.length} members to add to group with id ${groupId}`])
  
     for (const member of members) {
-        // If members.length is greater than 5, split the array into equal parts but not bigger than 5. This is to avoid throttling and issues with the graph api.
-        if (members.length > 5) {
-            logger('info', [logPrefix, `Found more than 5 members to remove from the group with id ${groupId}, splitting the array into equal parts of 5`])
-            const memberIndex = members.indexOf(member)
-            const memberIndexEnd = memberIndex + 5
-            const membersToProcess = members.slice(memberIndex, memberIndexEnd)
-            members.splice(memberIndex, 5)
-            const membersRemovedPart = await removeGroupMembers(groupId, membersToProcess)
-            continue
-        }
         let memberInfo = {
             memberID: member.id,
             groupID: groupId,
