@@ -15,7 +15,7 @@ const getOwnedObjects = async (upn) => {
     // Input validation
     if (!upn) throw new Error('Cannot search for a user if \'upn\' is not specified')
     const url = `https://graph.microsoft.com/v1.0/users/${upn}/ownedObjects?$select=id,displayName,mail,description`
-    let data = await graphRequest(url, 'GET', 'null', 'eventual')
+    let data = await graphRequest(url, 'GET', 'null')
     
     // Clean up the response
     if (data?.value) data = data.value
@@ -120,7 +120,7 @@ const removeGroupMembers = async (groupId, members) => {
         membersRemoved.total++
         const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/${member.id}/$ref`
         try {
-            const request = await graphRequest(url, 'DELETE', 'null', 'eventual')
+            const request = await graphRequest(url, 'DELETE', 'null')
             logger('info', [logPrefix, `Removed member with id ${member.id} to group with id ${groupId}`])
             membersRemoved.membersRemoved++
             membersRemoved.success.push(memberInfo)
@@ -176,7 +176,7 @@ const addGroupMembers = async (groupId, members) => {
         membersAdded.total++
         const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/$ref`
         try {
-            const request = await graphRequest(url, 'POST', { '@odata.id': `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}` }, 'eventual')
+            const request = await graphRequest(url, 'POST', { '@odata.id': `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}` })
             logger('info', [logPrefix, `Added member with id ${member.id} to group with id ${groupId}`])
             membersAdded.membersAdded++
             membersAdded.success.push(memberInfo)
