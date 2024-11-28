@@ -2,6 +2,7 @@ const { app } = require('@azure/functions');
 const { misc } = require('../../config.js')
 const { logger } = require('@vtfk/logger')
 const { handleUserActions } = require('../lib/jobs/handleUserActions.js')
+const { moveDocuments } = require('../lib/jobs/moveDocuments.js')
 
 app.timer('deactivateBlocks', {
     // At every 5th minute from 2 through 59.
