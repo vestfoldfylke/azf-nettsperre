@@ -12,6 +12,11 @@ app.timer('deactivateBlocks', {
         console.log(misc.email_domain)
         try {
             const response = await handleUserActions('deactivate')
+            // Move blocks when they are deactivated
+            // Move blocks when they are deactivated
+            await moveDocuments(mongoDB.blocksCollection, mongoDB.historyCollection, {status: 'expired'}, 10)
+            // Move blocks when they are deleted
+            await moveDocuments(mongoDB.blocksCollection, mongoDB.historyCollection, {status: 'deleted'}, 10)
             return { status: 200, jsonBody: response }
         } catch (error) {
             logger('error', [logPrefix, error])

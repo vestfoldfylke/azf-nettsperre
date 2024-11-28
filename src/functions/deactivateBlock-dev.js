@@ -14,7 +14,7 @@ app.http('deactivateBlock-dev', {
         try {
             const response = await handleUserActions('deactivate')
             // Move blocks when they are deactivated
-            await moveDocuments(mongoDB.blocksCollection, mongoDB.historyCollection, {status: 'deleted'}, 10)
+            await moveDocuments(mongoDB.blocksCollection, mongoDB.historyCollection, {status: 'expired'}, 10)
             // Move blocks when they are deleted
             await moveDocuments(mongoDB.blocksCollection, mongoDB.historyCollection, {status: 'deleted'}, 10)
 
