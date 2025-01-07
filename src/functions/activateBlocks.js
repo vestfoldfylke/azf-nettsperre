@@ -8,7 +8,7 @@ app.timer('activateBlocks', {
     schedule: '0-59/5 * * * *', 
     // schedule: '*/5 6-21 * * 1-5', // Every 5 minutes between 6am and 9pm, Monday to Friday
     handler: async (myTimer, context) => {
-        const logPrefix = 'activateBlock-dev'
+        const logPrefix = 'activateBlock'
         console.log(misc.email_domain)
         try {
             const response = await handleUserActions('activate')
