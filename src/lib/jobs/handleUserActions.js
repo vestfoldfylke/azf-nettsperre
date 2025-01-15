@@ -5,8 +5,19 @@ const { addGroupMembers, removeGroupMembers } = require('../../lib/graph/jobs/gr
 const { createStatistics } = require('./createStats.js');
 
 /**
- * 
- * @param {String} action | The action to be performed by the user [activate, deactivate]
+ * Handles user actions to activate or deactivate blocks.
+ *
+ * @param {string} action - The action to perform, either 'activate' or 'deactivate'.
+ * @returns {Promise<{status: number, jsonBody: Object}>} - The result of the action, including status and details of blocks added or removed.
+ *
+ * @async
+ * @function handleUserActions
+ *
+ * @example
+ * const result = await handleUserActions('activate');
+ * console.log(result);
+ *
+ * @throws {Error} - Throws an error if there is an issue connecting to the database or performing the action.
  */
 const handleUserActions = async (action) => {
     const logPrefix = 'handleUserActions'

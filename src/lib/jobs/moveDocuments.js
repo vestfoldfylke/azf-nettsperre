@@ -9,7 +9,14 @@ const connectToDB = async () => {
     return mongoClient.db(mongoDB.dbName)
 }
 
-// Function to insert a batch of documents into a collection
+/**
+ * Inserts a batch of documents into a specified collection in the database.
+ *
+ * @param {string} collection - The name of the collection to insert documents into.
+ * @param {Array<Object>} documents - An array of documents to be inserted.
+ * @returns {Promise<void>} - A promise that resolves when the documents have been inserted.
+ * @throws {Error} - Throws an error if the insertion fails.
+ */
 const insertBatch = async (collection, documents) => {
     const db = await connectToDB()
     try {
@@ -19,7 +26,13 @@ const insertBatch = async (collection, documents) => {
     }
 }
 
-// Function to delete a batch of documents from a collection
+/**
+ * Deletes a batch of documents from a specified collection in the database.
+ *
+ * @param {string} collection - The name of the collection from which documents will be deleted.
+ * @param {Array<Object>} documents - An array of documents to be deleted, each containing an `_id` property.
+ * @returns {Promise<void>} - A promise that resolves when the deletion process is complete.
+ */
 const deleteBatch = async (collection, documents) => {
     const db = await connectToDB()
     for (const document of documents) {
@@ -32,7 +45,15 @@ const deleteBatch = async (collection, documents) => {
 
 }
 
-// Function to move documents from one collection to another, using the insertBatch and deleteBatch functions. 
+/**
+ * Moves documents from a source collection to a target collection in batches.
+ *
+ * @param {string} sourceCollection - The name of the source collection.
+ * @param {string} targetCollection - The name of the target collection.
+ * @param {Object} filter - The filter criteria to select documents from the source collection.
+ * @param {number} limit - The maximum number of documents to move.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
+ */
 const moveDocuments = async (sourceCollection, targetCollection, filter, limit) => {
     const batchSize = 5
     // Connect to the database
