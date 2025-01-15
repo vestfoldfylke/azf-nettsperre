@@ -6,10 +6,12 @@ const { logger } = require('@vtfk/logger')
 app.http('getBlocks', {
     methods: ['GET'],
     authLevel: 'anonymous',
-    route: 'getBlocks/{status}/{upn}',
+    route: 'getBlocks/{status}/{upn}/{school}',
     handler: async (request, context) => {
         const status = request.params.status
         const upn = request.params.upn
+        const school = request.params.school
+        
         const logPrefix = 'getBlocks'
         const statusArray = []
         const validStatus = ['pending', 'active', 'expired']
@@ -57,12 +59,14 @@ app.http('getBlocks', {
              * @property {Object} status - The status filter object.
              * @property {Array} status.$in - Array of statuses to include in the filter.
              * @property {string} teacher.userPrincipalName - The user principal name of the teacher.
+             * @property {string} teacher.officeLocation - The school of the teacher.
              */
             const filter = {
                 status: {
                     $in: statusArray
                 },
-                ['teacher.userPrincipalName']: upn
+                ['teacher.userPrincipalName']: upn !== 'null' ? upn : { $exists: true },
+                ['teacher.officeLocation']: school !== 'null' ? school : { $exists: true }
             }
             // Fetch the blocks
             const response = await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).find(filter).toArray()
