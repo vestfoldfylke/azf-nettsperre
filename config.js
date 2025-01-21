@@ -14,6 +14,7 @@ module.exports = {
         dbName: process.env.MONGODB_DB_NAME,
         blocksCollection: process.env.MONGODB_BLOCKS_COLLECTION,
         historyCollection: process.env.MONGODB_HISTORY_COLLECTION,
+        impersonationCollection: process.env.MONGODB_IMPERSONATION_COLLECTION,
     },
     statistics: {
         url: process.env.STATISTICS_URL,
