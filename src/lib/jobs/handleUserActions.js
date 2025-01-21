@@ -3,6 +3,7 @@ const { mongoDB } = require('../../../config.js')
 const { logger } = require('@vtfk/logger')
 const { addGroupMembers, removeGroupMembers } = require('../../lib/graph/jobs/groups.js'); 
 const { createStatistics } = require('./createStats.js');
+const { formatDate } = require('../formatDate.js');
 
 /**
  * Handles user actions to activate or deactivate blocks.
@@ -25,11 +26,8 @@ const handleUserActions = async (action) => {
 
     // Connect to the database
     const mongoClient = await getMongoClient()
-    const d = new Date();
-    // We need to format the date to match the format in the database
-    const dateLocal = d.toLocaleString('nb-NO', {timeZone: 'Europe/Oslo', hour12: false, hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'});
-    // Reformat date from this "DD.MM.YYYY, HH:MM" to this format: YYYY-MM-DDTHH:MM
-    const dateLocalFormat = dateLocal.replace(/(\d{2})\.(\d{2})\.(\d{4}),\s(\d{2}):(\d{2})/, '$3-$2-$1T$4:$5')
+
+    const dateLocalFormat = formatDate(new Date())
     
     let blockStatus = null
     if(action === 'activate') {

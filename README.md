@@ -633,6 +633,10 @@ Om alt gikk bra:
 Status 403 Forbidden om valideringen ikke gikk bra.
 
 ## Jobs
+
+### handleLogEntry
+TODO!
+
 ### createStats
 
 `createStats`-funksjonen er en funksjon som oppretter statistikk for en blokkering i MongoDB.
