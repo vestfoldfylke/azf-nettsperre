@@ -82,6 +82,14 @@ app.http('updateBlock', {
                         logger('info', [logPrefix, 'New block type is fullBlock'])
                         groupId = blockGroup.offlineID
                     }
+                    if(lastItem.typeBlockChange.newType === 'formsFile') {
+                        logger('info', [logPrefix, 'New block type is formsFile'])
+                        groupId = blockGroup.formsFile
+                    }
+                    if(lastItem.typeBlockChange.newType === 'forms') {
+                        logger('info', [logPrefix, 'New block type is forms'])
+                        groupId = blockGroup.forms
+                    }
                     await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).updateOne({ _id: id }, {$set: { 'typeBlock.type': lastItem.typeBlockChange.newType, 'typeBlock.groupId': groupId }})
                     logger('info', [logPrefix, 'Block type updated'])
                     isChanged = true

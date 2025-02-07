@@ -24,7 +24,9 @@ module.exports = {
         eksamenID: process.env.NETTPSERRE_EKSAMEN_GROUP_ID,
         proveID: process.env.NETTPSERRE_PROVE_GROUP_ID,
         teamsID: process.env.NETTPSERRE_TEAMS_GROUP_ID,
-        offlineID: process.env.NETTPSERRE_OFFLINE_GROUP_ID
+        offlineID: process.env.NETTPSERRE_OFFLINE_GROUP_ID,
+        forms: process.env.NETTSPERRE_FORMS_GROUP_ID,
+        formsFile: process.env.NETTSPERRE_FORMSFILE_GROUP_ID
     },
     misc: {
         email_domain: process.env.EMAIL_DOMAIN,
