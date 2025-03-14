@@ -21,10 +21,10 @@ module.exports = {
         key: process.env.STATISTICS_KEY
     },
     blockGroup: {
-        eksamenID: process.env.NETTPSERRE_EKSAMEN_GROUP_ID,
-        proveID: process.env.NETTPSERRE_PROVE_GROUP_ID,
-        teamsID: process.env.NETTPSERRE_TEAMS_GROUP_ID,
-        offlineID: process.env.NETTPSERRE_OFFLINE_GROUP_ID,
+        eksamenID: process.env.NETTSPERRE_EKSAMEN_GROUP_ID,
+        proveID: process.env.NETTSPERRE_PROVE_GROUP_ID,
+        teamsID: process.env.NETTSPERRE_TEAMS_GROUP_ID,
+        offlineID: process.env.NETTSPERRE_OFFLINE_GROUP_ID,
         forms: process.env.NETTSPERRE_FORMS_GROUP_ID,
         formsFile: process.env.NETTSPERRE_FORMSFILE_GROUP_ID
     },
