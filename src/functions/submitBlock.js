@@ -53,6 +53,13 @@ app.http('submitBlock', {
         if(body.typeBlock.type === 'fullBlock') {
             body.typeBlock.groupId = blockGroup.offlineID
         }
+        if(body.typeBlock.type === 'formsFile') {
+            body.typeBlock.groupId = blockGroup.formsFile
+        }
+        if(body.typeBlock.type === 'forms') {
+            body.typeBlock.groupId = blockGroup.forms
+        }
+
         let returnBlock
         try {
             logger('info', [logPrefix, 'Inserting block into database'])
