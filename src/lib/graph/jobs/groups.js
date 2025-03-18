@@ -23,7 +23,8 @@ const getOwnedObjects = async (upn) => {
     // Return only school teams. 
     // Filter out any resources that is not an SDS team
     logger('info', [logPrefix, `Removing any resources that is not an SDS team for user with upn ${upn}`])
-    data = data.filter(object => object.mail && object.mail.toLowerCase().startsWith('section_'))
+    // Filter out any resources that is not a school team, kopi0624 or section_. Kopi0624 is a quick fix for this school year. 
+    data = data.filter(object => object.mail && (object.mail.toLowerCase().startsWith('section_') || object.mail.toLowerCase().startsWith('kopi0624')))
     // Filter out any resources that is expired
     logger('info', [logPrefix, `Removing any expired resources for user with upn ${upn}`])
     data = data.filter(object => !object.displayName.toLowerCase().startsWith('exp'))
