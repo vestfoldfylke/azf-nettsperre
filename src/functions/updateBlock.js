@@ -46,17 +46,19 @@ app.http('updateBlock', {
                 logger('info', [logPrefix, `Number of students to remove: ${lastItem.studentsToRemove.length}`])
                 for (const studentsToRemove of lastItem.studentsToRemove) {
                     logger('info', [logPrefix, `Removing student ${studentsToRemove.id} from block`])
+                    const groupId = await body.typeBlock.groupId
+                    await removeGroupMembers(groupId, studentsToRemove.id)
                     await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).updateOne({ _id: id }, {$pull: { 'students': {'id': studentsToRemove.id}}})
                 }
                 isChanged = true
             }
-            if(lastItem.studentsToRemove.length > 0 && await body.status === 'active'){
-                // Remove members from the group since the block is already active and remove from thje array of students
-                logger('info', [logPrefix, `Number of students removed: ${lastItem.studentsToRemove.length}`])
-                const groupId = await body.typeBlock.groupId
-                removeGroupMembersResponse = await removeGroupMembers(groupId, lastItem.studentsToRemove)
-                isChanged = true
-            }
+            // if(lastItem.studentsToRemove.length > 0 && await body.status === 'active'){
+            //     // Remove members from the group since the block is already active and remove from thje array of students
+            //     logger('info', [logPrefix, `Number of students removed: ${lastItem.studentsToRemove.length}`])
+            //     const groupId = await body.typeBlock.groupId
+            //     removeGroupMembersResponse = await removeGroupMembers(groupId, lastItem.studentsToRemove)
+            //     isChanged = true
+            // }
             // If the status is pending, add the members to the array of students
             if(lastItem.studentsToAdd.length > 0 && await body.status === 'pending'){
                 logger('info', [logPrefix, `Number of students to add: ${lastItem.studentsToAdd.length}`])
