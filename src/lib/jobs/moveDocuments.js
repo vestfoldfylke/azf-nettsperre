@@ -69,8 +69,25 @@ const moveDocuments = async (sourceCollection, targetCollection, filter, limit) 
     // Check if all the members actually is removed from the group before moving the documents
     logger ('info', [logPrefix, `Checking if all the members in the block is removed from the group`])
     for(const document of documents) {
+        const studentToRemove = [...document.students]
+        // Check if the document has an updated array and if it does, check if there are any students to remove
+        if(document.updated.length > 0) {
+            for (const updated of document.updated) {
+                // Check if the updated array has any students to remove
+                if(updated.studentsToRemove.length > 0) {
+                    // Add the students to remove to the studentToRemove array
+                    studentToRemove.push(...updated.studentsToRemove)
+                }
+            }   
+        }
+        // Remove duplicates from the studentToRemove array and create a new array with the unique students to remove
+        const uniqueStudentToRemove = [...new Set(studentToRemove.map(student => [student.id, student.displayName, student.userPrincipalName].join('|')))].map(item => {
+            const [id, displayName, userPrincipalName] = item.split('|')
+            return { id, displayName, userPrincipalName }
+        })
+        // Remove the members from the group
         try {
-            await removeGroupMembers(document.typeBlock.groupId, document.students)
+            await removeGroupMembers(document.typeBlock.groupId, uniqueStudentToRemove)
         } catch (error) {
             logger('error', [logPrefix, `Error moving document: ${error}`])
             continue

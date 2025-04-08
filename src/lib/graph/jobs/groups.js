@@ -122,12 +122,12 @@ const removeGroupMembers = async (groupId, members) => {
         const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/${member.id}/$ref`
         try {
             const request = await graphRequest(url, 'DELETE', 'null')
-            logger('info', [logPrefix, `Removed member with id ${member.id} to group with id ${groupId}`])
+            logger('info', [logPrefix, `Removed member with id ${member.id} from group with id ${groupId}`])
             membersRemoved.membersRemoved++
             membersRemoved.success.push(memberInfo)
         } catch (error) {
             console.error(error?.response?.data?.error || error)
-            logger('WARN', [logPrefix, `Failed to remove member with id ${member.id} from group with id ${groupId}`, error?.response?.data?.error || error])
+            logger('WARN', [logPrefix, `Failed to remove member with id ${member.id} from group with id ${groupId}`,'Member was probably already removed from the group but Microsoft was to slow to update the group members.' , error?.response?.data?.error || error])
             membersRemoved.membersRemoved++
             memberInfo.error = (error?.response?.data?.error || error)
             membersRemoved.failed.push(memberInfo)
