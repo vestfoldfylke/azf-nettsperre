@@ -1,6 +1,7 @@
 const { getMongoClient } = require('../../lib/auth/mongoClient.js')
 const { mongoDB } = require('../../../config.js')
 const { logger } = require('@vtfk/logger')
+const { removeGroupMembers } = require('../graph/jobs/groups.js')
 
 const logPrefix = 'moveDocuments'
 
@@ -64,6 +65,19 @@ const moveDocuments = async (sourceCollection, targetCollection, filter, limit) 
         logger('info', [logPrefix, `No documents found in ${sourceCollection} that match the filter: ${JSON.stringify(filter)}`])
         return
     }
+    logger('info', [logPrefix, `Found ${documents.length} documents in ${sourceCollection} that match the filter: ${JSON.stringify(filter)}`])
+    // Check if all the members actually is removed from the group before moving the documents
+    logger ('info', [logPrefix, `Checking if all the members in the block is removed from the group`])
+    for(const document of documents) {
+        try {
+            await removeGroupMembers(document.typeBlock.groupId, document.students)
+        } catch (error) {
+            logger('error', [logPrefix, `Error moving document: ${error}`])
+            continue
+        }
+    }
+    logger('info', [logPrefix, `All members in the block is removed from the group`])
+    
     // Split the documents into batches of the specified size
     const batches = []
     while (documents.length > 0) {
