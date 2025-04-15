@@ -126,8 +126,12 @@ const removeGroupMembers = async (groupId, members) => {
             membersRemoved.membersRemoved++
             membersRemoved.success.push(memberInfo)
         } catch (error) {
-            console.error(error?.response?.data?.error || error)
-            logger('WARN', [logPrefix, `Failed to remove member with id ${member.id} from group with id ${groupId}`,'Member was probably already removed from the group but Microsoft was to slow to update the group members.' , error?.response?.data?.error || error])
+            // Avoid logging ResourceNotFound errors as they are expected when the member is not in the group
+            if (error?.response?.data?.error?.code === 'Request_ResourceNotFound') {
+                logger('info', [logPrefix, `Member with id ${member.id} was not found in group with id ${groupId}`])
+            } else {
+                logger('WARN', [logPrefix, `Failed to remove member with id ${member.id} from group with id ${groupId}`,'Member was probably already removed from the group but Microsoft was to slow to update the group members.' , error?.response?.data?.error || error])
+            }
             membersRemoved.membersRemoved++
             memberInfo.error = (error?.response?.data?.error || error)
             membersRemoved.failed.push(memberInfo)
