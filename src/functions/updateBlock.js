@@ -47,7 +47,7 @@ app.http('updateBlock', {
                 for (const studentsToRemove of lastItem.studentsToRemove) {
                     logger('info', [logPrefix, `Removing student ${studentsToRemove.id} from block`])
                     const groupId = await body.typeBlock.groupId
-                    await removeGroupMembers(groupId, [studentsToRemove.id])
+                    await removeGroupMembers(groupId, [{id: studentsToRemove.id}])
                     await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).updateOne({ _id: id }, {$pull: { 'students': {'id': studentsToRemove.id}}})
                 }
                 isChanged = true

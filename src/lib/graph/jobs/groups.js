@@ -109,9 +109,11 @@ const removeGroupMembers = async (groupId, members) => {
     const currentMembers = await getGroupMembers(groupId)
     const currentMemberIds = currentMembers.map(member => member.id)
     members = members.filter(member => currentMemberIds.includes(member.id))
-    if(members.length === 0) return membersRemoved
+    if(members.length === 0) {  
+        logger('info', [logPrefix, `No members to removed found in group with id ${groupId}`])
+        return membersRemoved
+    }
     logger('info', [logPrefix, `Found ${members.length} members to remove from the group with id ${groupId}`])
-
     for (const member of members) {
         let memberInfo = {
             memberID: member.id,
@@ -171,20 +173,28 @@ const addGroupMembers = async (groupId, members) => {
     const currentMemberIds = currentMembers.map(member => member.id)
     members = members.filter(member => !currentMemberIds.includes(member.id))
     logger('info', [logPrefix, `Found ${members.length} members to add to group with id ${groupId}`])
- 
-    for (const member of members) {
-        let memberInfo = {
-            memberID: member.id,
-            groupID: groupId,
-            error: null
+
+
+    // Bulk add members to the group
+    const url = `https://graph.microsoft.com/v1.0/groups/${groupId}`
+
+    // Divide the members into chunks of 20
+    const chunkSize = 20 // 20 is the maximum number of members that can be added in a single request. Refer to the Microsoft Graph API documentation for more details.
+    const chunks = []
+    for (let i = 0; i < members.length; i += chunkSize) {
+        chunks.push(members.slice(i, i + chunkSize))
+    }
+
+    // Loop through the chunks and add the members to the group
+    for (const chunk of chunks) {
+        const body = {
+            "members@odata.bind": chunk.map(member => `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}`)
         }
-        membersAdded.total++
-        const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/$ref`
         try {
-            const request = await graphRequest(url, 'POST', { '@odata.id': `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}` })
-            logger('info', [logPrefix, `Added member with id ${member.id} to group with id ${groupId}`])
-            membersAdded.membersAdded++
-            membersAdded.success.push(memberInfo)
+            const request = await graphRequest(url, 'PATCH', body)
+            logger('info', [logPrefix, `Added ${chunk.length} members to group with id ${groupId}. Members added: ${chunk.map(member => member.id).join(', ')}`])
+            membersAdded.membersAdded += chunk.length
+            membersAdded.success.push(...chunk.map(member => ({ memberID: member.id, groupID: groupId })))
         } catch (error) {
             console.error(error?.response?.data?.error || error)
             logger('WARN', [logPrefix, `Failed to add member with id ${member.id} to group with id ${groupId}`, error?.response?.data?.error || error])
@@ -193,6 +203,28 @@ const addGroupMembers = async (groupId, members) => {
             membersAdded.failed.push(memberInfo)
         }
     }
+    // Dont need this anymore, since we are using the bulk add method above. But im a hoarder so I will keep it for now. 🦖
+    // for (const member of members) {
+    //     let memberInfo = {
+    //         memberID: member.id,
+    //         groupID: groupId,
+    //         error: null
+    //     }
+    //     membersAdded.total++
+    //     const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/$ref` // Single member
+    //     try {
+    //         const request = await graphRequest(url, 'POST', { '@odata.id': `https://graph.microsoft.com/v1.0/directoryObjects/${member.id}` })
+    //         logger('info', [logPrefix, `Added member with id ${member.id} to group with id ${groupId}`])
+    //         membersAdded.membersAdded++
+    //         membersAdded.success.push(memberInfo)
+    //     } catch (error) {
+    //         console.error(error?.response?.data?.error || error)
+    //         logger('WARN', [logPrefix, `Failed to add member with id ${member.id} to group with id ${groupId}`, error?.response?.data?.error || error])
+    //         membersAdded.failedNumber++
+    //         memberInfo.error = (error?.response?.data?.error || error)
+    //         membersAdded.failed.push(memberInfo)
+    //     }
+    // }
 
     return membersAdded
 }
