@@ -197,7 +197,7 @@ const addGroupMembers = async (groupId, members) => {
             membersAdded.success.push(...chunk.map(member => ({ memberID: member.id, groupID: groupId })))
         } catch (error) {
             console.error(error?.response?.data?.error || error)
-            logger('WARN', [logPrefix, `Failed to add member with id ${member.id} to group with id ${groupId}`, error?.response?.data?.error || error])
+            logger('WARN', [logPrefix, `Failed to add members with ids ${chunk.map(member => member.id).join(', ')} to group with id ${groupId}`, error?.response?.data?.error || error])
             membersAdded.failedNumber++
             memberInfo.error = (error?.response?.data?.error || error)
             membersAdded.failed.push(memberInfo)
