@@ -29,7 +29,7 @@ const handleUserActions = async (action) => {
 
   const dateLocalFormat = formatDate(new Date())
 
-  let blockStatus = action === 'activate' ? 'pending' : 'active'
+  const blockStatus = action === 'activate' ? 'pending' : 'active'
 
   const blockObj = {
     blocksAdded: [],
