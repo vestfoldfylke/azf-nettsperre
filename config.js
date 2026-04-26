@@ -3,11 +3,11 @@ module.exports = {
     tenantId: process.env.AZURE_APP_TENANT_ID,
     clientId: process.env.AZURE_APP_ID,
     clientSecret: process.env.AZURE_APP_SECRET,
-    scope: process.env.AZURE_APP_SCOPE || 'https://graph.microsoft.com/.default',
-    grantType: process.env.AZURE_APP_GRANT_TYPE || 'client_credentials',
+    scope: process.env.AZURE_APP_SCOPE || "https://graph.microsoft.com/.default",
+    grantType: process.env.AZURE_APP_GRANT_TYPE || "client_credentials",
     issuer: `https://sts.windows.net/${process.env.AZURE_APP_TENANT_ID}/`,
     jwkUri: `https://login.microsoftonline.com/${process.env.AZURE_APP_TENANT_ID}/discovery/v2.0/keys`,
-    audience: process.env.AZURE_APP_AUDIENCE || 'Audience'
+    audience: process.env.AZURE_APP_AUDIENCE || "Audience"
   },
   mongoDB: {
     connectionString: process.env.MONGODB_CONNECTION_STRING,
@@ -30,6 +30,6 @@ module.exports = {
   },
   misc: {
     email_domain: process.env.EMAIL_DOMAIN,
-    allowedCompanies: (process.env.SKIPVALIDATION && process.env.SKIPVALIDATION.split(',')) || []
+    allowedCompanies: process.env.SKIPVALIDATION?.split(",") || []
   }
-}
+};

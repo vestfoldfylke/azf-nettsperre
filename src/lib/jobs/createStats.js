@@ -1,7 +1,6 @@
-const { statistics } = require('../../../config.js')
-const { logger } = require('@vtfk/logger')
-const { getUser } = require('../graph/jobs/users.js')
-const axios = require('axios')
+const { logger } = require("@vestfoldfylke/loglady");
+const { statistics } = require("../../../config.js");
+const { getUser } = require("../graph/jobs/users.js");
 
 /**
  * Creates statistics for a given block and action.
@@ -21,51 +20,64 @@ const axios = require('axios')
  * @throws {Error} Throws an error if unable to create statistics.
  */
 const createStatistics = async (block, action) => {
-  const logPrefix = 'createStatistics'
-  logger('info', [logPrefix, `Creating statistics for block: ${block._id}`])
+  const logPrefix = "createStatistics";
+  logger.info("{logPrefix} - Creating statistics for block: {BlockId}", logPrefix, block._id);
+
   // Get info about the teacher who owns the team
-  const teamOwner = await getUser(block.teacher.userPrincipalName)
+  const teamOwner = await getUser(block.teacher.userPrincipalName);
+
   // Get info about the person who created the block
-  const createdBy = await getUser(block.createdBy.userPrincipalName)
-  // Build the request
+  const createdBy = await getUser(block.createdBy.userPrincipalName);
 
-  const request = {
-    method: 'post',
-    url: statistics.url + '/stats',
+  const payload = {
+    system: "Nettsperre",
+    engine: "azf-nettsperre",
+    company: teamOwner.companyName,
+    department: teamOwner.officeLocation,
+    description: "Viser antall elever i blokken og hvor mange ganger blokken er oppdatert. Hvilke skole blokken tilhører. Hvilken type blokk det er og hvor blokken ble opprettet fra.",
+    externalId: block._id,
+    type: action,
+    // Optional fields
+    blockType: block.typeBlock.type,
+    createdByCompany: createdBy.companyName,
+    createdByDepartment: createdBy.officeLocation,
+    numberOfStudents: block.students.length,
+    timesBlockWasUpdated: block.updated.length
+  };
+
+  const response = await fetch(`${statistics.url}/stats`, {
+    method: "POST",
     headers: {
-      'x-functions-key': statistics.key
+      "Content-Type": "application/json",
+      "X-Functions-Key": statistics.key
     },
-    data: {
-      system: 'Nettsperre',
-      engine: 'azf-nettsperre',
-      company: teamOwner.companyName,
-      department: teamOwner.officeLocation,
-      description: 'Viser antall elever i blokken og hvor mange ganger blokken er oppdatert. Hvilke skole blokken tilhører. Hvilken type blokk det er og hvor blokken ble opprettet fra.',
-      externalId: block._id,
-      type: action,
-      // Optional fields
-      blockType: block.typeBlock.type,
-      createdByCompany: createdBy.companyName,
-      createdByDepartment: createdBy.officeLocation,
-      numberOfStudents: block.students.length,
-      timesBlockWasUpdated: block.updated.length
-    }
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    logger.errorException(error, "Failed to POST statistics update. Status: {Status}, StatusText: {StatusText}", response.status, response.statusText);
+    throw new Error(`Failed to POST statistics update. Status: ${response.status}, StatusText: ${response.statusText}. Error: ${JSON.stringify(error)}`);
   }
 
-  // Make the request
-  const response = await axios.request(request)
-  // Handle and return the response
-  if (!response || !response.data) return undefined
-  if (Array.isArray(response.data)) {
-    if (response.data.length === 0) return undefined
-    if (response.data.length > 1) {
-      logger('error', [logPrefix, 'Was not able to create statistics'])
-      throw new Error('Was not able to create statistics')
-    }
-    response.data = response.data[0]
-  }
-  logger('info', [logPrefix, `Statistics created for block: ${block._id}`])
-  return response.data
-}
+  const responseData = await response.json();
 
-module.exports = { createStatistics }
+  if (Array.isArray(responseData)) {
+    if (responseData.length === 0) {
+      return undefined;
+    }
+
+    if (responseData.length > 1) {
+      logger.error("{logPrefix} - Was not able to create statistics", logPrefix);
+      throw new Error("Was not able to create statistics");
+    }
+
+    logger.info("{logPrefix} - Statistics created for block: {BlockId}", logPrefix, block._id);
+    return responseData[0];
+  }
+
+  logger.info("{logPrefix} - Statistics created for block: {BlockId}", logPrefix, block._id);
+  return responseData;
+};
+
+module.exports = { createStatistics };

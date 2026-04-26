@@ -1,4 +1,4 @@
-const { graphRequest } = require('../call-graph.js')
+const { graphRequest } = require("../call-graph.js");
 
 /**
  * Fetches user details from Microsoft Graph API based on the provided user principal name (UPN).
@@ -9,10 +9,12 @@ const { graphRequest } = require('../call-graph.js')
  */
 const getUser = async (upn) => {
   // Input validation
-  if (!upn) throw new Error('Cannot search for a user if \'upn\' is not specified')
+  if (!upn) {
+    throw new Error("Cannot search for a user if 'upn' is not specified");
+  }
 
-  const url = `https://graph.microsoft.com/v1.0/users/${upn}?$select=id,displayName,givenName,surname,userPrincipalName,companyName,officeLocation,preferredLanguage,mail,jobTitle,mobilePhone,businessPhones`
-  return await graphRequest(url, 'GET', 'null')
-}
+  const url = `https://graph.microsoft.com/v1.0/users/${upn}?$select=id,displayName,givenName,surname,userPrincipalName,companyName,officeLocation,preferredLanguage,mail,jobTitle,mobilePhone,businessPhones`;
+  return await graphRequest(url, "GET");
+};
 
-module.exports = { getUser }
+module.exports = { getUser };

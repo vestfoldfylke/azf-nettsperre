@@ -1,25 +1,31 @@
-const { MongoClient } = require('mongodb')
-const { mongoDB } = require('../../../config.js')
-const { logger } = require('@vtfk/logger')
+const { logger } = require("@vestfoldfylke/loglady");
+const { MongoClient } = require("mongodb");
+const { mongoDB } = require("../../../config.js");
 
-let client = null
+let client = null;
 
 /**
  *
  * @returns { import('mongodb').MongoClient }
  */
 const getMongoClient = async () => {
-  if (!client) {
-    logger('info', ['mongo-client', 'Client does not exist - creating'])
-    client = new MongoClient(mongoDB.connectionString)
-    logger('info', ['mongo-client', 'Client connected'])
+  if (client) {
+    return client;
   }
-  return client
-}
+
+  logger.info("mongo-client - Client does not exist - creating");
+  client = new MongoClient(mongoDB.connectionString);
+  logger.info("mongo-client - Client connected");
+
+  return client;
+};
 
 const closeMongoClient = () => {
-  if (client) client.close()
-  client = null
-}
+  if (client) {
+    client.close();
+  }
 
-module.exports = { getMongoClient, closeMongoClient }
+  client = null;
+};
+
+module.exports = { getMongoClient, closeMongoClient };
