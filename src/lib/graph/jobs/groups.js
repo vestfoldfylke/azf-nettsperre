@@ -1,6 +1,7 @@
 const { logger } = require("@vestfoldfylke/loglady");
 const { graphRequest } = require("../call-graph.js");
 const { misc } = require("../../../../config.js");
+const HTTPError = require("../../HTTPError");
 
 /**
  * Retrieves the list of directory objects owned by a user, filters out non-SDS teams and expired resources.
@@ -159,25 +160,17 @@ const removeGroupMembers = async (groupId, members) => {
       membersRemoved.success.push(memberInfo);
     } catch (error) {
       // Avoid logging ResourceNotFound errors as they are expected when the member is not in the group
-      // TODO: Change this to not error log when code === "Request_ResourceNotFound"
-      logger.errorException(
-        error,
-        "{logPrefix} - Failed to remove member with id {MemberId} from group with id {GroupId}. Member was probably already removed from the group but Microsoft was to slow to update the group members.",
-        logPrefix,
-        member.id,
-        groupId
-      );
-
-      /*if (error?.response?.data?.error?.code === "Request_ResourceNotFound") {
-        logger.info("{logPrefix} - Member with id {MemberId} was not found in group with id {GroupId}", logPrefix, member.id, groupId);
+      if (error instanceof HTTPError && error.status === 404) {
+        logger.info("{logPrefix} - Member with id {MemberId} was not found in group with id {GroupId}. Error: {@Error}", logPrefix, member.id, groupId, error);
       } else {
         logger.warn(
-          "{logPrefix} - Failed to remove member with id {MemberId} from group with id {GroupId}. Member was probably already removed from the group but Microsoft was to slow to update the group members.",
+          "{logPrefix} - Failed to remove member with id {MemberId} from group with id {GroupId}. Member was probably already removed from the group but Microsoft was to slow to update the group members. Error: {@Error}",
           logPrefix,
           member.id,
-          groupId
+          groupId,
+          error
         );
-      }*/
+      }
 
       membersRemoved.membersRemoved++;
       memberInfo.error = error;

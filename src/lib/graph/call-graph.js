@@ -1,5 +1,6 @@
 const { logger } = require("@vestfoldfylke/loglady");
 const getMsalToken = require("../auth/get-endtraid-token.js");
+const HTTPError = require("../HTTPError.js");
 
 // Calls the MS Graph API and returns the data
 /**
@@ -35,7 +36,7 @@ const graphRequest = async (url, method, data = undefined, consistencyLevel = un
   if (!response.ok) {
     const error = await response.json();
     logger.errorException(error, "Failed to make {Method} request to graph. Status: {Status}, StatusText: {StatusText}", method, response.status, response.statusText);
-    throw new Error(`Failed to make ${method} request to graph. Status: ${response.status}, StatusText: ${response.statusText}. Error: ${JSON.stringify(error)}`);
+    throw new HTTPError(response.status, response.statusText, error);
   }
 
   return response.json();
