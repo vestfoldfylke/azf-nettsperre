@@ -37,7 +37,7 @@ const graphRequest = async (url, method, data = undefined, consistencyLevel = un
 
   if (!response.ok) {
     const error = await response.json();
-    const isGraphObjectNotFound = (error.data?.error?.message || "").includes("object references do not exist");
+    const isGraphObjectNotFound = (error.error?.message || "").includes("object references do not exist");
     if (isGraphObjectNotFound || response.status === 404) {
       throw new HTTPError(404, response.statusText, error);
     }
