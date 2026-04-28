@@ -37,7 +37,20 @@ const graphRequest = async (url, method, data = undefined, consistencyLevel = un
 
   if (!response.ok) {
     const error = await response.json();
-    logger.errorException(error, "Failed to make {Method} request to graph. Status: {Status}, StatusText: {StatusText}", method, response.status, response.statusText);
+    const isGraphObjectNotFound = (error.data?.error?.message || "").includes("object references do not exist");
+    if (isGraphObjectNotFound) {
+      throw new HTTPError(404, response.statusText, error);
+    }
+
+    logger.error(
+      "Failed to make {Method} request to graph with URL: {Url} and possibly Data: {@Data}. Status: {Status}, StatusText: {StatusText}. Error: {@Error}",
+      method,
+      url,
+      data,
+      response.status,
+      response.statusText,
+      error
+    );
     throw new HTTPError(response.status, response.statusText, error);
   }
 
