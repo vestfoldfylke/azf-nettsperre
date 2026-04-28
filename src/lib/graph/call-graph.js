@@ -15,8 +15,10 @@ const graphRequest = async (url, method, data = undefined, consistencyLevel = un
   // Get access token
   const accessToken = await getMsalToken("https://graph.microsoft.com/.default");
 
+  const fetchMethod = method.toUpperCase();
+
   const options = {
-    method: method.toUpperCase(),
+    method: fetchMethod,
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json"
@@ -39,7 +41,9 @@ const graphRequest = async (url, method, data = undefined, consistencyLevel = un
     throw new HTTPError(response.status, response.statusText, error);
   }
 
-  return response.json();
+  if (!["DELETE", "PATCH"].includes(fetchMethod)) {
+    return response.json();
+  }
 };
 
 module.exports = { graphRequest };
