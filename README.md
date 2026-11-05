@@ -1,6 +1,8 @@
 # AZF-NETTSPERRE
-En azure function for håndtering av sperringer satt i nettsperre-løsningen. 
+
+En azure function for håndtering av sperringer satt i nettsperre-løsningen.
 ## Functions
+
 ### activateBlocks.js
 
 `activateBlocks`-funksjonen er en Azure-tidsstyrt funksjon som aktiverer blokker i MongoDB.
@@ -16,14 +18,14 @@ En azure function for håndtering av sperringer satt i nettsperre-løsningen.
 Denne funksjonen kjører med jevne mellomrom basert på den angitte tidsplanen. Den aktiverer blokker ved å bruke `handleUserActions`-funksjonen.
 
 - **handleUserActions**: [src\lib\jobs\handleUserActions.js](src\lib\jobs\handleUserActions.js)
-    - [Les mer her](#handleuseractions)
+  - [Les mer her](#handleuseractions)
 
 #### Eksempel Svar
 
 ```json
 {
-    "status": 200,
-    "jsonBody": "..."
+  "status": 200,
+  "jsonBody": "..."
 }
 ```
 
@@ -43,16 +45,16 @@ Denne funksjonen kjører med jevne mellomrom basert på den angitte tidsplanen. 
 Denne funksjonen kjører med jevne mellomrom basert på den angitte tidsplanen. Den deaktiverer blokker ved å bruke `handleUserActions`-funksjonen og flytter deaktiverte og slettede blokker til historikk-kolleksjonen ved å bruke `moveDocuments`-funksjonen.
 
 - **handleUserActions**: [src\lib\jobs\handleUserActions.js](src\lib\jobs\handleUserActions.js)
-    - [Les mer her](#handleuseractions)
+  - [Les mer her](#handleuseractions)
 - **moveDocuments**: [src\lib\jobs\handleUserActions.js](src\lib\jobs\handleUserActions.js)
-    - [Les mer her](#movedocuments)
+  - [Les mer her](#movedocuments)
 
 #### Eksempel Svar
 
 ```json
 {
-    "status": 200,
-    "jsonBody": "..."
+  "status": 200,
+  "jsonBody": "..."
 }
 ```
 ### deleteBlock.js
@@ -114,26 +116,27 @@ GET /api/extendedUserInfo/user@example.com
 ```
 
 #### Eksempel Svar
+
 ```json
 {
-	"@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users(id,displayName,givenName,surname,userPrincipalName,companyName,officeLocation,preferredLanguage,mail,jobTitle,mobilePhone,businessPhones)/$entity",
-	"id": "...",
-	"displayName": "...",
-	"givenName": "...",
-	"surname": "...",
-	"userPrincipalName": "...",
-	"companyName": "...",
-	"officeLocation": "...",
-	"preferredLanguage": "...",
-	"mail": "...",
-	"jobTitle": "...",
-	"mobilePhone": "...",
-	"businessPhones": []
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users(id,displayName,givenName,surname,userPrincipalName,companyName,officeLocation,preferredLanguage,mail,jobTitle,mobilePhone,businessPhones)/$entity",
+  "id": "...",
+  "displayName": "...",
+  "givenName": "...",
+  "surname": "...",
+  "userPrincipalName": "...",
+  "companyName": "...",
+  "officeLocation": "...",
+  "preferredLanguage": "...",
+  "mail": "...",
+  "jobTitle": "...",
+  "mobilePhone": "...",
+  "businessPhones": []
 }
-
 ```
 
 ### getBlocks.js
+
 `getBlocks`-funksjonen er en Azure-funksjon som henter blokkeringsdata fra MongoDB basert på status og UPN.
 
 #### Funksjonsdetaljer
@@ -159,6 +162,7 @@ GET /api/getBlocks/active,pending/user@example.com
 ```
 
 #### Eksempel Svar
+
 ```json
 [
     {
@@ -208,6 +212,7 @@ GET /api/getBlocks/active,pending/user@example.com
 ```
 
 ### getGroupMembers.js
+
 `getGroupMembers`-funksjonen er en Azure-funksjon som henter medlemmer av en spesifisert gruppe.
 
 #### Funksjonsdetaljer
@@ -232,22 +237,23 @@ Denne funksjonen henter medlemmer av en spesifisert gruppe ved hjelp av `groupId
 GET /api/getGroupMembers/groupId123/true
 ```
 #### Eksempel Svar
+
 ```json
 [
-	{
-		"@odata.type": "#microsoft.graph.user",
-		"id": "...",
-		"displayName": "...",
-		"mail": "...",
-		"officeLocation": null
-	},
-	{
-		"@odata.type": "#microsoft.graph.user",
-		"id": "...",
-		"displayName": "...",
-		"mail": "...",
-		"officeLocation": null
-	}
+  {
+    "@odata.type": "#microsoft.graph.user",
+    "id": "...",
+    "displayName": "...",
+    "mail": "...",
+    "officeLocation": null
+  },
+  {
+    "@odata.type": "#microsoft.graph.user",
+    "id": "...",
+    "displayName": "...",
+    "mail": "...",
+    "officeLocation": null
+  }
 ]
 ```
 
@@ -268,7 +274,7 @@ GET /api/getGroupMembers/groupId123/true
 
 #### Beskrivelse
 
-Denne funksjonen henter grupper eid av en spesifisert bruker ved hjelp av UPN. Den bruker `getOwnedObjects`-funksjonen fra [../lib/graph/jobs/groups.js](src/lib/graph/jobs/groups.js) for å hente dataene. 
+Denne funksjonen henter grupper eid av en spesifisert bruker ved hjelp av UPN. Den bruker `getOwnedObjects`-funksjonen fra [../lib/graph/jobs/groups.js](src/lib/graph/jobs/groups.js) for å hente dataene.
 
 #### Eksempel Forespørsel
 
@@ -277,22 +283,23 @@ GET /api/getOwnedGroups/user@example.com
 ```
 
 #### Eksempel Svar
+
 ```json
 [
-	{
-		"@odata.type": "#microsoft.graph.group",
-		"id": "...",
-		"displayName": "...",
-		"mail": "...",
-		"description": "..."
-	},
-	{
-		"@odata.type": "#microsoft.graph.group",
-		"id": "...",
-		"displayName": "...",
-		"mail": "...",
-		"description": "..."
-	}   
+  {
+    "@odata.type": "#microsoft.graph.group",
+    "id": "...",
+    "displayName": "...",
+    "mail": "...",
+    "description": "..."
+  },
+  {
+    "@odata.type": "#microsoft.graph.group",
+    "id": "...",
+    "displayName": "...",
+    "mail": "...",
+    "description": "..."
+  }
 ]
 ```
 
@@ -324,6 +331,7 @@ GET /api/history/teacher@example.com/courseName/schoolName
 ```
 
 #### Eksempel Svar
+
 ```json
 [
     {
@@ -372,6 +380,7 @@ GET /api/history/teacher@example.com/courseName/schoolName
 ```
 
 ### submitBlock.js
+
 `submitBlock`-funksjonen er en Azure-funksjon som legger til en ny blokkering i MongoDB.
 
 #### Funksjonsdetaljer
@@ -445,13 +454,15 @@ Content-Type: application/json
 }
 ```
 #### Eksempel Svar
+
 ```json
 {
-    "acknowledged": true,
-    "insertedId": "60c72b2f9b1d8e5a5c8b4567"
+  "acknowledged": true,
+  "insertedId": "60c72b2f9b1d8e5a5c8b4567"
 }
 ```
 ### updateBlock.js
+
 `updateBlock`-funksjonen er en Azure-funksjon som oppdaterer en eksisterende blokkering i MongoDB.
 
 #### Funksjonsdetaljer
@@ -473,6 +484,7 @@ Funksjonen forventer en JSON-body med følgende struktur:
 Denne funksjonen mottar en JSON-body med informasjon om hvilken blokkering som skal oppdateres og hvilke felt som skal endres. Den oppdaterer deretter den spesifiserte blokkeringen i MongoDB.
 
 #### Eksempel Forespørsel
+
 ```http
 PUT /api/updateBlock
 Content-Type: application/json
@@ -551,14 +563,16 @@ Eksempel: Legge til en elev.
 }
 ```
 #### Eksempel Svar
+
 ```json
 {
-    "acknowledged": true,
-    "modifiedCount": 1
+  "acknowledged": true,
+  "modifiedCount": 1
 }
 ```
 
 ### validatePermissions.js
+
 `validatePermission`-funksjonen er en Azure-funksjon som validerer om en forespørrer har tillatelse til å redigere en lærer basert på spesifikke kriterier.
 
 #### Funksjonsdetaljer
@@ -593,7 +607,8 @@ Content-Type: application/json
 }
 ```
 #### Eksempel Svar
-Om alt gikk bra: 
+
+Om alt gikk bra:
 ```json
 {
 	"requestor": {
@@ -635,6 +650,7 @@ Status 403 Forbidden om valideringen ikke gikk bra.
 ## Jobs
 
 ### handleLogEntry
+
 TODO!
 
 ### createStats
@@ -698,7 +714,9 @@ Denne funksjonen håndterer brukerhandlinger ved å aktivere eller deaktivere bl
 Denne funksjonen flytter dokumenter fra en kildekolleksjon til en målkolleksjon basert på et filter. Den deler dokumentene inn i batcher av en spesifisert størrelse, setter inn hver batch i målkolleksjonen og sletter deretter hver batch fra kildekolleksjonen.
 
 ## Graph Jobs
+
 ### groups
+
 `groups.js` inneholder funksjoner for å håndtere grupper i Microsoft Graph API, inkludert å hente eide objekter, hente gruppemedlemmer, legge til gruppemedlemmer og fjerne gruppemedlemmer.
 
 #### Funksjonsdetaljer
@@ -708,6 +726,7 @@ Denne funksjonen flytter dokumenter fra en kildekolleksjon til en målkolleksjon
 #### Funksjoner
 
 ##### getOwnedObjects
+
 Henter objekter eid av en bruker.
 
 ###### Parametere
@@ -715,26 +734,33 @@ Henter objekter eid av en bruker.
 - `upn`: User Principal Name (UPN) til brukeren.
 
 ##### getGroupMembers
+
 Henter medlemmer av en gruppe.
 
 ###### Parametere
+
 - `groupId`: ID-en til gruppen.
 
 ##### addGroupMembers
+
 Legger til medlemmer i en gruppe.
 
 ###### Parametere
+
 - `groupId`: ID-en til gruppen.
 - `members`: Array av medlemmer som skal legges til.
 
 ##### removeGroupMembers
+
 Fjerner medlemmer fra en gruppe.
 
 ###### Parametere
+
 - `groupId`: ID-en til gruppen.
 - `members`: Array av medlemmer som skal fjernes.
 
 ### users
+
 `users.js` inneholder funksjoner for å hente brukerdata fra Microsoft Graph API basert på User Principal Name (UPN).
 
 #### Funksjonsdetaljer
