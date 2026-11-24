@@ -42,13 +42,19 @@ export const handleUserActions = async (action: UserAction): Promise<UserActions
     const blocks: WithId<Block>[] = await mongoClient
       .db(mongoDB.dbName)
       .collection<Block>(mongoDB.blocksCollection)
-      .find({ status: blockStatus, startBlock: { $lte: dateLocalFormat } })
+      .find({
+        status: blockStatus,
+        startBlock: { $lte: dateLocalFormat }
+      })
       .toArray();
     logger.info("{logPrefix} - Found {BlockCount} blocks", logPrefix, blocks.length);
 
     // If there are no blocks, return
     if (blocks.length < 1) {
-      return { status: 200, jsonBody: `No blocks to ${action}` };
+      return {
+        status: 200,
+        jsonBody: `No blocks to ${action}`
+      };
     }
 
     // Loop through the blocks that are found
@@ -79,7 +85,10 @@ export const handleUserActions = async (action: UserAction): Promise<UserActions
       blockObj.blocksAdded.push(block);
     }
 
-    return { status: 200, jsonBody: blockObj };
+    return {
+      status: 200,
+      jsonBody: blockObj
+    };
   }
 
   // Find any blocks with the start date less than or equal to the current date
@@ -88,14 +97,20 @@ export const handleUserActions = async (action: UserAction): Promise<UserActions
   const blocks: WithId<Block>[] = await mongoClient
     .db(mongoDB.dbName)
     .collection<Block>(mongoDB.blocksCollection)
-    .find({ status: blockStatus, endBlock: { $lte: dateLocalFormat } })
+    .find({
+      status: blockStatus,
+      endBlock: { $lte: dateLocalFormat }
+    })
     .toArray();
 
   logger.info("{logPrefix} - Found {BlockCount} blocks", logPrefix, blocks.length);
 
   // If there are no blocks, return
   if (blocks.length < 1) {
-    return { status: 200, jsonBody: `No blocks to ${action}` };
+    return {
+      status: 200,
+      jsonBody: `No blocks to ${action}`
+    };
   }
 
   // Loop through the blocks that are found
@@ -125,5 +140,8 @@ export const handleUserActions = async (action: UserAction): Promise<UserActions
     blockObj.blocksRemoved.push(block);
   }
 
-  return { status: 200, jsonBody: blockObj };
+  return {
+    status: 200,
+    jsonBody: blockObj
+  };
 };

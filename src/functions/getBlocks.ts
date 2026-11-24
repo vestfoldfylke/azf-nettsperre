@@ -23,7 +23,10 @@ const getBlocksHandler = async (request: HttpRequest, _context: InvocationContex
   // Check if the array contains valid status
   if (!statusArray.every(isValidStatus)) {
     logger.error("{logPrefix} - Invalid status provided", logPrefix);
-    return { status: 400, body: "Invalid status provided" };
+    return {
+      status: 400,
+      body: "Invalid status provided"
+    };
   }
 
   try {
@@ -47,11 +50,17 @@ const getBlocksHandler = async (request: HttpRequest, _context: InvocationContex
     logger.info("{logPrefix} - Blocks fetched, found: {BlockCount}", logPrefix, response.length);
 
     // Return the response
-    return { status: 200, jsonBody: response };
+    return {
+      status: 200,
+      jsonBody: response
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix}", logPrefix);
     // Return the error
-    return { status: 400, body: getErrorMessage(error) };
+    return {
+      status: 400,
+      body: getErrorMessage(error)
+    };
   }
 };
 

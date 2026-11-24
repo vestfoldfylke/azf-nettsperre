@@ -237,7 +237,14 @@ export const addGroupMembers = async (groupId: string | null, members: BlockStud
       logger.info("{logPrefix} - Added {MemberCount} members to group with id {GroupId}. Members added: {@MemberIds}", logPrefix, chunk.length, groupId, memberIds);
 
       membersAdded.membersAdded += chunk.length;
-      membersAdded.success.push(...memberIds.map((memberId: string): GroupMemberResult => ({ memberID: memberId, groupID: groupId })));
+      membersAdded.success.push(
+        ...memberIds.map(
+          (memberId: string): GroupMemberResult => ({
+            memberID: memberId,
+            groupID: groupId
+          })
+        )
+      );
     } catch (error) {
       logger.errorException(error, "{logPrefix} - Failed to add members with ids {@MemberIds} to group with id {GroupId}", logPrefix, memberIds, groupId);
 

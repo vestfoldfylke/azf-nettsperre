@@ -20,10 +20,16 @@ const deactivateBlockDevHandler = async (_request: HttpRequest, _context: Invoca
     // Move blocks when they are deleted
     await moveDocuments(mongoDB.blocksCollection, mongoDB.historyCollection, { status: "deleted" }, MAX_DOCUMENTS_TO_MOVE);
 
-    return { status: 200, jsonBody: response };
+    return {
+      status: 200,
+      jsonBody: response
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix}", logPrefix);
-    return { status: 400, body: getErrorMessage(error) };
+    return {
+      status: 400,
+      body: getErrorMessage(error)
+    };
   }
 };
 

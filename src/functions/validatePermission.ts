@@ -50,10 +50,16 @@ const validatePermissionHandler = async (request: HttpRequest, _context: Invocat
         await createLogEntry(logData);
       } catch (error) {
         logger.errorException(error, "{logPrefix}", logPrefix);
-        return { status: 500, body: "Internal Server Error" };
+        return {
+          status: 500,
+          body: "Internal Server Error"
+        };
       }
 
-      return { status: 403, body: "Forbidden" };
+      return {
+        status: 403,
+        body: "Forbidden"
+      };
     }
 
     // If requestor and teacher to be edited are in the same office location, log the validation result.
@@ -68,11 +74,20 @@ const validatePermissionHandler = async (request: HttpRequest, _context: Invocat
     await createLogEntry(logData);
   } catch (error) {
     logger.errorException(error, "{logPrefix}", logPrefix);
-    return { status: 500, body: "Internal Server Error" };
+    return {
+      status: 500,
+      body: "Internal Server Error"
+    };
   }
 
   // Return requestor and teacher to be edited info
-  return { status: 200, jsonBody: { requestor: requestorInfo, teacher: teacherToBeEditedInfo } };
+  return {
+    status: 200,
+    jsonBody: {
+      requestor: requestorInfo,
+      teacher: teacherToBeEditedInfo
+    }
+  };
 };
 
 app.http("validatePermission", {

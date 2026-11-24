@@ -17,37 +17,58 @@ const submitBlockHandler = async (request: HttpRequest, _context: InvocationCont
   // Validate the request body
   if (!body) {
     logger.error("{logPrefix} - Invalid request, no body provided", logPrefix);
-    return { status: 400, body: "Invalid request, no body provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no body provided"
+    };
   }
 
   if (body.students.length < 0) {
     logger.error("{logPrefix} - Invalid request, no students provided", logPrefix);
-    return { status: 400, body: "Invalid request, no students provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no students provided"
+    };
   }
 
   if (!body.teacher.teacherId) {
     logger.error("{logPrefix} - Invalid request, no teacherId provided", logPrefix);
-    return { status: 400, body: "Invalid request, no teacherId provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no teacherId provided"
+    };
   }
 
   if (!body.blockedGroup.id) {
     logger.error("{logPrefix} - Invalid request, no blockedGroupId provided", logPrefix);
-    return { status: 400, body: "Invalid request, no blockedGroupId provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no blockedGroupId provided"
+    };
   }
 
   if (!body.typeBlock.type) {
     logger.error("{logPrefix} - Invalid request, no type provided", logPrefix);
-    return { status: 400, body: "Invalid request, no type provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no type provided"
+    };
   }
 
   if (!body.startBlock) {
     logger.error("{logPrefix} - Invalid request, no startBlock provided", logPrefix);
-    return { status: 400, body: "Invalid request, no startBlock provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no startBlock provided"
+    };
   }
 
   if (!body.endBlock) {
     logger.error("{logPrefix} - Invalid request, no endBlock provided", logPrefix);
-    return { status: 400, body: "Invalid request, no endBlock provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no endBlock provided"
+    };
   }
 
   // Modify the request body
@@ -84,10 +105,16 @@ const submitBlockHandler = async (request: HttpRequest, _context: InvocationCont
 
     logger.info("{logPrefix} - Block inserted into database", logPrefix);
 
-    return { status: 201, jsonBody: returnBlock };
+    return {
+      status: 201,
+      jsonBody: returnBlock
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix}", logPrefix);
-    return { status: 500, body: getErrorMessage(error) };
+    return {
+      status: 500,
+      body: getErrorMessage(error)
+    };
   }
 };
 

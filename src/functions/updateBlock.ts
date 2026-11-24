@@ -24,7 +24,10 @@ const updateBlockHandler = async (request: HttpRequest, _context: InvocationCont
   const lastItem: BlockUpdate | undefined = body.updated.at(-1);
   if (!lastItem) {
     logger.error("{logPrefix} - Invalid request, no updated array provided", logPrefix);
-    return { status: 400, body: "Invalid request, no updated array provided" };
+    return {
+      status: 400,
+      body: "Invalid request, no updated array provided"
+    };
   }
 
   const response: UpdateBlockResponse = {
@@ -98,7 +101,15 @@ const updateBlockHandler = async (request: HttpRequest, _context: InvocationCont
       await mongoClient
         .db(mongoDB.dbName)
         .collection<Block>(mongoDB.blocksCollection)
-        .updateOne({ _id: id }, { $set: { "typeBlock.type": newType, "typeBlock.groupId": groupId } });
+        .updateOne(
+          { _id: id },
+          {
+            $set: {
+              "typeBlock.type": newType,
+              "typeBlock.groupId": groupId
+            }
+          }
+        );
       logger.info("{logPrefix} - Block type updated", logPrefix);
 
       isChanged = true;
@@ -140,10 +151,16 @@ const updateBlockHandler = async (request: HttpRequest, _context: InvocationCont
         .updateOne({ _id: id }, { $push: { updated: lastItem } });
     }
 
-    return { status: 200, jsonBody: response };
+    return {
+      status: 200,
+      jsonBody: response
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix}", logPrefix);
-    return { status: 400, body: getErrorMessage(error) };
+    return {
+      status: 400,
+      body: getErrorMessage(error)
+    };
   }
 };
 

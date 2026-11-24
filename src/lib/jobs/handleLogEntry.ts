@@ -13,10 +13,16 @@ export const createLogEntry = async (logEntry: ValidationLogEntry): Promise<LogE
 
   try {
     await mongoClient.db(mongoDB.dbName).collection<ValidationLogEntry>(mongoDB.impersonationCollection).insertOne(logEntry);
-    return { status: 200, body: "Log entry created" };
+    return {
+      status: 200,
+      body: "Log entry created"
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix}", logPrefix);
   }
 
-  return { status: 500, body: "Internal Server Error" };
+  return {
+    status: 500,
+    body: "Internal Server Error"
+  };
 };

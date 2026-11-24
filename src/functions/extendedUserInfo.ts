@@ -9,10 +9,16 @@ const extendedUserInfoHandler = async (request: HttpRequest, _context: Invocatio
 
   try {
     const userInfo: GraphUser = await getUser(upn);
-    return { status: 200, jsonBody: userInfo };
+    return {
+      status: 200,
+      jsonBody: userInfo
+    };
   } catch (error) {
     logger.errorException(error, "extendedUserInfo");
-    return { status: 400, jsonBody: getErrorMessage(error) };
+    return {
+      status: 400,
+      jsonBody: getErrorMessage(error)
+    };
   }
 };
 

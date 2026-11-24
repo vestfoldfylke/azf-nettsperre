@@ -7,7 +7,10 @@ const getOwnedGroupsHandler = async (request: HttpRequest, _context: InvocationC
 
   const ownedObjects: GraphOwnedObject[] = await getOwnedObjects(upn);
 
-  return { status: 200, jsonBody: ownedObjects };
+  return {
+    status: 200,
+    jsonBody: ownedObjects
+  };
 };
 
 app.http("getOwnedGroups", {

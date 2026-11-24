@@ -9,10 +9,16 @@ const activateBlockDevHandler = async (_request: HttpRequest, _context: Invocati
 
   try {
     const response: UserActionsResponse = await handleUserActions("activate");
-    return { status: 200, jsonBody: response };
+    return {
+      status: 200,
+      jsonBody: response
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix}", logPrefix);
-    return { status: 400, body: getErrorMessage(error) };
+    return {
+      status: 400,
+      body: getErrorMessage(error)
+    };
   }
 };
 

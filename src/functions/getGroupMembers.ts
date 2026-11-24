@@ -8,7 +8,10 @@ const getGroupMembersHandler = async (request: HttpRequest, _context: Invocation
 
   const groupMembers: GraphGroupMember[] = await getGroupMembers(groupId, onlyStudents);
 
-  return { status: 200, jsonBody: groupMembers };
+  return {
+    status: 200,
+    jsonBody: groupMembers
+  };
 };
 
 app.http("getGroupMembers", {

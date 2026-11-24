@@ -23,6 +23,7 @@ export const getMsalTokenForScope = async (scope: string, options: CacheOptions 
   }
 
   logger.info("{logPrefix} - no token in cache, fetching new from Microsoft", logPrefix);
+
   const config: Configuration = {
     auth: {
       clientId: appReg.clientId,
@@ -30,6 +31,7 @@ export const getMsalTokenForScope = async (scope: string, options: CacheOptions 
       clientSecret: appReg.clientSecret
     }
   };
+
   // Create msal application object
   const cca: ConfidentialClientApplication = new ConfidentialClientApplication(config);
   const clientCredentials: ClientCredentialRequest = {

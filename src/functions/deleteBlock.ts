@@ -25,7 +25,10 @@ const deleteBlockHandler = async (request: HttpRequest, _context: InvocationCont
       .findOne({ _id: new ObjectId(id) });
     if (!block) {
       logger.error("{logPrefix} - Block not found", logPrefix);
-      return { status: 404, body: "Block not found" };
+      return {
+        status: 404,
+        body: "Block not found"
+      };
     }
 
     if (block.status === "active" && action === "delete") {
@@ -39,36 +42,56 @@ const deleteBlockHandler = async (request: HttpRequest, _context: InvocationCont
         .db(mongoDB.dbName)
         .collection<Block>(mongoDB.blocksCollection)
         .updateOne({ _id: new ObjectId(id) }, { $set: { status: "deleted" } });
+
       // Create stats
       await createStatistics(block, action);
-      return { status: 200, jsonBody: body };
+
+      return {
+        status: 200,
+        jsonBody: body
+      };
     }
 
     if (action === "deactivate") {
       // Deactivate the block
       logger.info("{logPrefix} - Deactivating block with id: {Id}", logPrefix, id);
+
       try {
         logger.info("{logPrefix} - Removing {StudentCount} students from group: {GroupId}", logPrefix, block.students.length, block.typeBlock.groupId);
         await removeGroupMembers(block.typeBlock.groupId, block.students);
+
         await mongoClient
           .db(mongoDB.dbName)
           .collection<Block>(mongoDB.blocksCollection)
           .updateOne({ _id: new ObjectId(id) }, { $set: { status: "expired" } });
+
         // Create stats
         await createStatistics(block, action);
 
-        return { status: 200, jsonBody: body };
+        return {
+          status: 200,
+          jsonBody: body
+        };
       } catch (error) {
         logger.errorException(error, "{logPrefix} - Failed to deactivate block with id: {Id}", logPrefix, id);
-        return { status: 400, body: getErrorMessage(error) };
+        return {
+          status: 400,
+          body: getErrorMessage(error)
+        };
       }
     }
 
     logger.error("{logPrefix} - Unknown action {Action} for block with id: {Id}", logPrefix, action, id);
-    return { status: 400, body: `Unknown action '${action}'. Valid actions are 'delete' and 'deactivate'` };
+    return {
+      status: 400,
+      body: `Unknown action '${action}'. Valid actions are 'delete' and 'deactivate'`
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix} - Failed to find block or delete block with id: {Id}", logPrefix, id);
-    return { status: 400, body: getErrorMessage(error) };
+    return {
+      status: 400,
+      body: getErrorMessage(error)
+    };
   }
 };
 

@@ -37,10 +37,16 @@ const historyHandler = async (request: HttpRequest, _context: InvocationContext)
       .find(filter, { sort: { _id: -1 } })
       .toArray();
 
-    return { status: 200, jsonBody: response };
+    return {
+      status: 200,
+      jsonBody: response
+    };
   } catch (error) {
     logger.errorException(error, "{logPrefix} - Error fetching history", logPrefix);
-    return { status: 400, jsonBody: getErrorMessage(error) };
+    return {
+      status: 400,
+      jsonBody: getErrorMessage(error)
+    };
   }
 };
 
