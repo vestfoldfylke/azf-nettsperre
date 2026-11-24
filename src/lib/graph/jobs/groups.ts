@@ -165,7 +165,7 @@ export const removeGroupMembers = async (groupId: string | null, members: BlockS
         );
       }
 
-      membersRemoved.membersRemoved++;
+      membersRemoved.failedNumber++;
       memberInfo.error = error;
       membersRemoved.failed.push(memberInfo);
     }

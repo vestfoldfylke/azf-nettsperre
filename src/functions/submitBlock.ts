@@ -3,9 +3,10 @@ import { logger } from "@vestfoldfylke/loglady";
 import type { InsertOneResult, MongoClient, WithId } from "mongodb";
 import type { Block } from "../../types/block.js";
 import type { SubmitBlockBody } from "../../types/requests.js";
-import { blockGroup, mongoDB } from "../config.js";
+import { blockGroup, mongoDB, validBlockTypes } from "../config.js";
 import { getMongoClient } from "../lib/auth/mongoClient.js";
 import { getErrorMessage } from "../lib/getErrorMessage.js";
+import { isValidBlockType } from "../lib/validations.js";
 
 type SubmittedBlock = Pick<WithId<Block>, "_id" | "students" | "teacher" | "blockedGroup" | "typeBlock" | "startBlock" | "endBlock">;
 
@@ -23,7 +24,7 @@ const submitBlockHandler = async (request: HttpRequest, _context: InvocationCont
     };
   }
 
-  if (body.students.length < 0) {
+  if (!Array.isArray(body.students) || body.students.length === 0) {
     logger.error("{logPrefix} - Invalid request, no students provided", logPrefix);
     return {
       status: 400,
@@ -31,7 +32,7 @@ const submitBlockHandler = async (request: HttpRequest, _context: InvocationCont
     };
   }
 
-  if (!body.teacher.teacherId) {
+  if (!body.teacher?.teacherId) {
     logger.error("{logPrefix} - Invalid request, no teacherId provided", logPrefix);
     return {
       status: 400,
@@ -39,7 +40,7 @@ const submitBlockHandler = async (request: HttpRequest, _context: InvocationCont
     };
   }
 
-  if (!body.blockedGroup.id) {
+  if (!body.blockedGroup?.id) {
     logger.error("{logPrefix} - Invalid request, no blockedGroupId provided", logPrefix);
     return {
       status: 400,
@@ -47,11 +48,19 @@ const submitBlockHandler = async (request: HttpRequest, _context: InvocationCont
     };
   }
 
-  if (!body.typeBlock.type) {
+  if (!body.typeBlock?.type) {
     logger.error("{logPrefix} - Invalid request, no type provided", logPrefix);
     return {
       status: 400,
       body: "Invalid request, no type provided"
+    };
+  }
+
+  if (!isValidBlockType(body.typeBlock.type)) {
+    logger.error("{logPrefix} - Invalid request, unknown block type {BlockType}. Valid types: {@ValidBlockTypes}", logPrefix, body.typeBlock.type, validBlockTypes);
+    return {
+      status: 400,
+      body: `Invalid request, unknown block type ${body.typeBlock.type}. Valid types: ${validBlockTypes.join(", ")}`
     };
   }
 

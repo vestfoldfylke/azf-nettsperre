@@ -3,10 +3,11 @@ import { logger } from "@vestfoldfylke/loglady";
 import { type MongoClient, ObjectId } from "mongodb";
 import type { Block, BlockUpdate } from "../../types/block.js";
 import type { UpdateBlockBody } from "../../types/requests.js";
-import { blockGroup, mongoDB } from "../config.js";
+import { blockGroup, mongoDB, validBlockTypes } from "../config.js";
 import { getMongoClient } from "../lib/auth/mongoClient.js";
 import { getErrorMessage } from "../lib/getErrorMessage.js";
 import { removeGroupMembers } from "../lib/graph/jobs/groups.js";
+import { isValidBlockType } from "../lib/validations.js";
 
 type UpdateBlockResponse = BlockUpdate & {
   blockedGroup: {
@@ -27,6 +28,15 @@ const updateBlockHandler = async (request: HttpRequest, _context: InvocationCont
     return {
       status: 400,
       body: "Invalid request, no updated array provided"
+    };
+  }
+
+  const newType: string | undefined = lastItem.typeBlockChange?.newType;
+  if (newType !== undefined && !isValidBlockType(newType)) {
+    logger.error("{logPrefix} - Invalid request, unknown block type {BlockType}. Valid types: {@ValidBlockTypes}", logPrefix, newType, validBlockTypes);
+    return {
+      status: 400,
+      body: `Invalid request, unknown block type '${newType}'. Use one of: ${validBlockTypes.join(", ")}`
     };
   }
 
@@ -75,7 +85,6 @@ const updateBlockHandler = async (request: HttpRequest, _context: InvocationCont
     }
 
     // If the type of the block has changed, update the groupId and type
-    const newType: string | undefined = lastItem.typeBlockChange?.newType;
     if (newType !== undefined && newType !== lastItem.typeBlockChange?.oldType) {
       logger.info("{logPrefix} - Block type has changed, updating groupId and type", logPrefix);
       logger.info("{logPrefix} - New block type is {BlockType}", logPrefix, newType);

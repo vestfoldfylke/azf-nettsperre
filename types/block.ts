@@ -1,6 +1,10 @@
+import type { validBlockTypes } from "../src/config.js";
+
 export type BlockStatus = "pending" | "active" | "expired" | "deleted";
 
 export type BlockAction = "activate" | "deactivate" | "delete";
+
+export type BlockType = (typeof validBlockTypes)[number];
 
 export type UserAction = Exclude<BlockAction, "delete">;
 

@@ -37,3 +37,5 @@ export const misc: MiscConfig = {
   email_domain: process.env.EMAIL_DOMAIN ?? "",
   allowedCompanies: process.env.SKIPVALIDATION?.split(",") || []
 };
+
+export const validBlockTypes = ["fullBlock", "eksamen", "forms", "formsFile"] as const satisfies readonly string[];
