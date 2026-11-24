@@ -1,29 +1,31 @@
-const { app } = require("@azure/functions");
-const { logger } = require("@vestfoldfylke/loglady");
-const { getMongoClient } = require("../lib/auth/mongoClient.js");
-const { mongoDB } = require("../../config.js");
-const { removeGroupMembers } = require("../lib/graph/jobs/groups.js");
-const { ObjectId } = require("mongodb");
-const { createStatistics } = require("../lib/jobs/createStats.js");
+import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
+import { logger } from "@vestfoldfylke/loglady";
+import { type MongoClient, ObjectId, type WithId } from "mongodb";
+import type { Block } from "../../types/block.js";
+import { mongoDB } from "../config.js";
+import { getMongoClient } from "../lib/auth/mongoClient.js";
+import { getErrorMessage } from "../lib/getErrorMessage.js";
+import { removeGroupMembers } from "../lib/graph/jobs/groups.js";
+import { createStatistics } from "../lib/jobs/createStats.js";
 
 app.http("deleteBlock", {
   methods: ["POST"],
   authLevel: "anonymous",
   route: "deleteBlock/{id}/{action}",
-  handler: async (request, _context) => {
-    const body = await request.json();
-    const id = request.params.id;
-    let action = request.params.action; // Must be able to change the action to deactivate if the block is active
-    const logPrefix = "deleteBlock";
+  handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
+    const body: unknown = await request.json();
+    const id: string = request.params.id ?? "";
+    let action: string = request.params.action ?? ""; // Must be able to change the action to deactivate if the block is active
+    const logPrefix: string = "deleteBlock";
 
     // Connect to the database
-    const mongoClient = await getMongoClient();
+    const mongoClient: MongoClient = await getMongoClient();
 
     try {
       // Find the block with the provided id
-      const block = await mongoClient
+      const block: WithId<Block> | null = await mongoClient
         .db(mongoDB.dbName)
-        .collection(mongoDB.blocksCollection)
+        .collection<Block>(mongoDB.blocksCollection)
         .findOne({ _id: new ObjectId(id) });
       if (!block) {
         logger.error("{logPrefix} - Block not found", logPrefix);
@@ -39,7 +41,7 @@ app.http("deleteBlock", {
         logger.info("{logPrefix} - Deleting block with id: {Id}", logPrefix, id);
         await mongoClient
           .db(mongoDB.dbName)
-          .collection(mongoDB.blocksCollection)
+          .collection<Block>(mongoDB.blocksCollection)
           .updateOne({ _id: new ObjectId(id) }, { $set: { status: "deleted" } });
         // Create stats
         await createStatistics(block, action);
@@ -54,7 +56,7 @@ app.http("deleteBlock", {
           await removeGroupMembers(block.typeBlock.groupId, block.students);
           await mongoClient
             .db(mongoDB.dbName)
-            .collection(mongoDB.blocksCollection)
+            .collection<Block>(mongoDB.blocksCollection)
             .updateOne({ _id: new ObjectId(id) }, { $set: { status: "expired" } });
           // Create stats
           await createStatistics(block, action);
@@ -62,12 +64,15 @@ app.http("deleteBlock", {
           return { status: 200, jsonBody: body };
         } catch (error) {
           logger.errorException(error, "{logPrefix} - Failed to deactivate block with id: {Id}", logPrefix, id);
-          return { status: 400, body: error.message };
+          return { status: 400, body: getErrorMessage(error) };
         }
       }
+
+      logger.error("{logPrefix} - Unknown action {Action} for block with id: {Id}", logPrefix, action, id);
+      return { status: 400, body: `Unknown action '${action}'. Valid actions are 'delete' and 'deactivate'` };
     } catch (error) {
       logger.errorException(error, "{logPrefix} - Failed to find block or delete block with id: {Id}", logPrefix, id);
-      return { status: 400, body: error.message };
+      return { status: 400, body: getErrorMessage(error) };
     }
   }
 });

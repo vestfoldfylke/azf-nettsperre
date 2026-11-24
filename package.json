@@ -2,14 +2,20 @@
   "name": "azf-nettsperre",
   "version": "3.0.34",
   "description": "Azure Functions for nettsperre",
-  "main": "src/functions/*.js",
+  "type": "module",
+  "main": "dist/src/functions/*.js",
   "engines": {
     "node": ">=20.19.0"
   },
   "scripts": {
+    "lint": "biome check && tsc --noEmit --project tsconfig.json",
+    "lint:fix": "biome check --write",
+    "build": "tsc --project tsconfig.json",
+    "watch": "tsc -w",
+    "clean": "rm -rf dist",
+    "prestart": "npm run clean && npm run build",
     "start": "func start",
-    "test": "biome check",
-    "lint:fix": "biome check --write"
+    "test": "npm run lint"
   },
   "dependencies": {
     "@azure/functions": "^4.17.1",
@@ -19,6 +25,8 @@
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.8"
+    "@biomejs/biome": "2.6.8",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
   }
 }

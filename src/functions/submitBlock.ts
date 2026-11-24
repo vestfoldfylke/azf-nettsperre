@@ -1,17 +1,22 @@
-const { app } = require("@azure/functions");
-const { logger } = require("@vestfoldfylke/loglady");
-const { getMongoClient } = require("../lib/auth/mongoClient.js");
-const { mongoDB, blockGroup } = require("../../config.js");
+import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
+import { logger } from "@vestfoldfylke/loglady";
+import type { InsertOneResult, MongoClient, WithId } from "mongodb";
+import type { Block } from "../../types/block.js";
+import type { SubmitBlockBody } from "../../types/requests.js";
+import { blockGroup, mongoDB } from "../config.js";
+import { getMongoClient } from "../lib/auth/mongoClient.js";
+import { getErrorMessage } from "../lib/getErrorMessage.js";
+
+type SubmittedBlock = Pick<WithId<Block>, "_id" | "students" | "teacher" | "blockedGroup" | "typeBlock" | "startBlock" | "endBlock">;
 
 app.http("submitBlock", {
   methods: ["POST"],
   authLevel: "anonymous",
   route: "submitBlock",
-  handler: async (request, _context) => {
-    const body = await request.json();
+  handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
+    const body: SubmitBlockBody | null = (await request.json()) as SubmitBlockBody | null;
 
-    const logPrefix = "submitBlock";
-    let response = null;
+    const logPrefix: string = "submitBlock";
 
     // Validate the request body
     if (!body) {
@@ -66,13 +71,12 @@ app.http("submitBlock", {
       body.typeBlock.groupId = blockGroup.forms;
     }
 
-    let returnBlock;
     try {
       logger.info("{logPrefix} - Inserting block into database", logPrefix);
-      const mongoClient = await getMongoClient();
-      response = await mongoClient.db(mongoDB.dbName).collection(mongoDB.blocksCollection).insertOne(body);
+      const mongoClient: MongoClient = await getMongoClient();
+      const response: InsertOneResult<Block> = await mongoClient.db(mongoDB.dbName).collection<Block>(mongoDB.blocksCollection).insertOne(body);
 
-      returnBlock = {
+      const returnBlock: SubmittedBlock = {
         _id: response.insertedId,
         students: body.students,
         teacher: body.teacher,
@@ -83,10 +87,11 @@ app.http("submitBlock", {
       };
 
       logger.info("{logPrefix} - Block inserted into database", logPrefix);
+
+      return { status: 201, jsonBody: returnBlock };
     } catch (error) {
       logger.errorException(error, "{logPrefix}", logPrefix);
-      return { status: 500, body: error.message };
+      return { status: 500, body: getErrorMessage(error) };
     }
-    return { status: 201, jsonBody: returnBlock };
   }
 });

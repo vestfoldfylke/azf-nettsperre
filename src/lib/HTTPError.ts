@@ -1,15 +1,17 @@
-class HTTPError extends Error {
-  status;
-  body;
-  data;
+import type { HttpResponseInit } from "@azure/functions";
+
+export class HTTPError extends Error {
+  public readonly status: number;
+  public readonly body: string;
+  public readonly data: unknown;
 
   /**
    *
    * @param status - HTTP status code
    * @param message - Error message
-   * @param [data] - Optional additional data (stringified JSON)
+   * @param [data] - Optional additional data (object or stringified JSON)
    */
-  constructor(status, message, data = undefined) {
+  constructor(status: number, message: string, data: unknown = null) {
     super(message);
 
     this.status = status;
@@ -18,7 +20,7 @@ class HTTPError extends Error {
     this.name = "HTTPError";
   }
 
-  getBody() {
+  getBody(): unknown {
     try {
       return JSON.parse(this.body);
     } catch {
@@ -26,9 +28,13 @@ class HTTPError extends Error {
     }
   }
 
-  getData() {
+  getData(): unknown {
     if (!this.data) {
-      return undefined;
+      return null;
+    }
+
+    if (typeof this.data !== "string") {
+      return this.data;
     }
 
     try {
@@ -38,7 +44,7 @@ class HTTPError extends Error {
     }
   }
 
-  getJsonBody(includeData = false) {
+  getJsonBody(includeData: boolean = false): Record<string, unknown> {
     if (includeData && this.data) {
       return {
         body: this.getBody(),
@@ -51,7 +57,7 @@ class HTTPError extends Error {
     };
   }
 
-  toResponse(includeData = false) {
+  toResponse(includeData: boolean = false): HttpResponseInit {
     return {
       headers: { "Content-Type": "application/json" },
       status: this.status,
@@ -59,5 +65,3 @@ class HTTPError extends Error {
     };
   }
 }
-
-module.exports = HTTPError;
