@@ -1,6 +1,6 @@
 {
   "name": "azf-nettsperre",
-  "version": "1.0.1",
+  "version": "3.0.35",
   "description": "Azure Functions for nettsperre",
   "type": "module",
   "main": "dist/src/functions/*.js",
