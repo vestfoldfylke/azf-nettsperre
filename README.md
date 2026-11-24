@@ -1,6 +1,7 @@
 # AZF-NETTSPERRE
 
 En azure function for håndtering av sperringer satt i nettsperre-løsningen.
+
 ## Functions
 
 ### activateBlocks.js
@@ -28,7 +29,6 @@ Denne funksjonen kjører med jevne mellomrom basert på den angitte tidsplanen. 
   "jsonBody": "..."
 }
 ```
-
 
 ### deactivateBlocks.js
 
@@ -490,6 +490,7 @@ PUT /api/updateBlock
 Content-Type: application/json
 ```
 Eksempel: Legge til en elev.
+
 ```json
 {
     {
@@ -592,6 +593,7 @@ Funksjonen forventer en JSON-body med følgende struktur:
 #### Beskrivelse
 
 Denne funksjonen validerer om forespørreren har tillatelse til å redigere læreren basert på følgende kriterier:
+
 1. Hvis forespørreren er en del av de tillatte selskapene, hoppes valideringen over.
 2. Hvis forespørreren ikke er en del av de tillatte selskapene, sjekkes det om forespørreren og læreren som skal redigeres er på samme kontorplassering.
 
@@ -609,6 +611,7 @@ Content-Type: application/json
 #### Eksempel Svar
 
 Om alt gikk bra:
+
 ```json
 {
 	"requestor": {
